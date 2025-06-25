@@ -1,0 +1,2932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collateral Policies</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --primary: #006ca7;
+      --accent: #17a2b8;
+      --bg-light: #ffffff;
+      --card-light: #f0f0f0;
+      --legal-color: #006ca7;
+      --tech-color: #17a2b8;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to right, blue, white);
+      padding: 2px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon {
+      font-size: 1.6em;
+      background-color: #007bff;
+      color: white;
+      padding: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-title {
+      font-size: 1.3em;
+      font-weight: 1000;
+      color: white;
+      letter-spacing: 0.5px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    .header-title::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 3px;
+      background-color: #007bff;
+      margin-top: 4px;
+      border-radius: 2px;
+    }
+
+    .header-nav a {
+      position: relative;
+      padding: 6px 12px;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      color: black;
+      text-decoration: none;
+      margin-left: 16px;
+    }
+
+    .header-nav a:hover {
+      background-color: white;
+      color: orange;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-nav a#resetFilters {
+      background-color: #f8f9fa;
+      color: #dc3545;
+      border: 1px solid #dc3545;
+      margin-right: 5px;
+    }
+
+    .header-nav a#resetFilters:hover {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .header-nav a#resetFilters i {
+      margin-right: 5px;
+    }
+
+    .welcome-cards {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      flex: 1;
+      min-width: 250px;
+      background: linear-gradient(to bottom right, #e0f7f7, #ffffff);
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: #0056b3;
+    }
+
+    .card p {
+      color: #444;
+      font-size: 0.95em;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Nunito', 'Segoe UI', sans-serif;
+      background: var(--bg-light);
+      color: #111111;
+      font-size: 80%;
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 64px);
+    }
+
+    .sidebar {
+      width: 260px;
+      background: var(--card-light);
+      border-right: 1px solid #ccc;
+      overflow-y: auto;
+      padding: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar.collapsed {
+      transform: translateX(-260px);
+    }
+
+    .sidebar-heading {
+      color: var(--primary);
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 10px 0 5px 10px;
+      cursor: pointer;
+      transition: color 0.3s;
+      padding: 8px;
+      border-radius: 6px;
+      background-color: rgba(0, 108, 167, 0.1);
+    }
+
+    .sidebar-heading:hover {
+      color: var(--accent);
+      background-color: rgba(0, 108, 167, 0.2);
+    }
+
+    .sidebar-heading.active {
+      background-color: rgba(0, 108, 167, 0.3);
+      font-weight: bold;
+    }
+
+    .sidebar button.zone-tab {
+      width: 100%;
+      border: none;
+      background: none;
+      text-align: left;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      color: black;
+      border-radius: 8px;
+      transition: background-color 0.3s, color 0.3s;
+      margin-left: 15px;
+      display: none;
+    }
+
+    .sidebar button.zone-tab:hover {
+      background-color: #fdd555;
+      color: white;
+    }
+
+    .sidebar button.zone-tab.active {
+      background: linear-gradient(to left, #f0f0f0, #ffeb99);
+      color: orange;
+      font-weight: bold;
+      border-left: 4px solid #ff7f50;
+      padding-left: 12px;
+      border-radius: 4px;
+    }
+
+    .region-list {
+      padding-left: 15px;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .region-list div {
+      padding: 6px 10px;
+      margin: 4px 0;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .region-list div:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .region-list div.active {
+      background: linear-gradient(to right, #add8e6, #f0f0f0);
+      color: var(--primary);
+      font-weight: bold;
+      border-left: 4px solid var(--primary);
+      padding-left: 12px;
+      border-radius: 4px;
+    }
+
+    .main {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      transition: margin-left 0.3s ease;
+    }
+
+    .main.expanded {
+      margin-left: -260px;
+    }
+
+    .filters select,
+    .filters input {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1em;
+      color: #333;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      transition: border-color 0.3s, box-shadow 0.3s;
+      width: 230px;
+    }
+
+    .filters select:focus,
+    .filters input:focus {
+      border-color: #3399ff;
+      box-shadow: 0 0 0 3px rgba(51, 153, 255, 0.3);
+      outline: none;
+    }
+
+    .breadcrumb {
+      background: #e8f6fa;
+      padding: 10px 15px;
+      border-radius: 6px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .doc-section ul {
+      list-style: none;
+      padding: 15px 20px;
+      background: #f8fafd;
+      border: 1px solid #e0e6eb;
+      border-radius: 8px;
+    }
+
+    .accordion {
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      margin-bottom: 12px;
+      font-family: 'Nunito', sans-serif;
+      overflow: hidden;
+      font-size: 0.95em;
+      position: relative;
+    }
+
+    .doc-type-badge {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      padding: 3px 8px;
+      background: var(--legal-color);
+      color: white;
+      border-radius: 4px;
+      font-size: 0.7em;
+    }
+
+    .doc-type-badge.technical {
+      background: var(--tech-color);
+    }
+
+    .collapsible {
+      background-color: #e6f0ff;
+      color: #222;
+      cursor: pointer;
+      padding: 8px 14px;
+      width: 100%;
+      border: none;
+      text-align: left;
+      font-size: 1em;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+      border-radius: 10px 10px 0 0;
+      padding-right: 100px;
+    }
+
+    .collapsible:hover {
+      background-color: blue;
+      color: white;
+    }
+
+    .content {
+      padding: 10px 14px;
+      background-color: #f9f9f9;
+      border-radius: 0 0 10px 10px;
+      display: none;
+    }
+
+    .content ul {
+      list-style: none;
+      padding-left: 40px;
+      margin: 10px 0;
+    }
+
+    .content li {
+      padding: 6px 10px;
+      font-size: 1em;
+      color: #1a1a1a;
+      transition: background 0.3s ease, color 0.3s ease, font-weight 0.3s ease;
+      border-radius: 6px;
+    }
+
+    .content li:hover {
+      background-color: rgba(197, 197, 197, 0.671);
+      color: #050000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .deviation-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 0.9em;
+    }
+
+    .deviation-table th, 
+    .deviation-table td {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+
+    .deviation-table th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .deviation-table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .deviation-table tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .deviation-table .status-complete {
+      color: green;
+      font-weight: bold;
+    }
+
+    .deviation-table .status-pending {
+      color: orange;
+      font-weight: bold;
+    }
+
+    .toggle-sidebar {
+      position: fixed;
+      left: 10px;
+      top: 70px;
+      z-index: 1000;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .toggle-sidebar:hover {
+      background: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .collapsible.active {
+      background-color: blue;
+      color: white;
+    }
+
+    .collapsible.active + .content {
+      display: block;
+    }
+    
+    .cluster-deviation {
+      border-left: 4px solid var(--primary);
+      padding-left: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <span class="icon"><i class="fas fa-file-alt"></i></span>
+      <h2 class="header-title">Collateral Policies</h2>
+    </div>
+    <div class="header-nav">
+      <a href="#" id="resetFilters" onclick="resetAllFilters()">
+        <i class="fas fa-undo"></i> Reset Filters
+      </a>
+      <a href="#">Home</a>
+      <a href="https://www.shubham.co/contact-us">Contact Us</a>
+      <a href="https://www.shubham.co/">Website</a>
+    </div>
+  </div>
+
+  <button class="toggle-sidebar" id="toggleSidebar">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <div class="container">
+    <div class="sidebar" id="sidebar">
+      <!-- Zone and Region buttons will be loaded by JavaScript -->
+    </div>
+
+    <div class="main" id="mainContent">
+      <div id="welcome">
+        <h2>Welcome</h2>
+        <p>We're delighted to have you here! This portal is your centralized hub for accessing a wide range of documents related to collateral policies.</p>
+        <ul>
+          <li>🔍 Easily search for policy guidelines, branch-specific requirements, and case-type documentation.</li>
+          <li>📂 Select your <strong>Category, Zone, State, Region, Branch, Document Type</strong>, and <strong>Case Type</strong> to view tailored results.</li>
+          <li>⚡ Enjoy a seamless, efficient experience designed to help you find the right information quickly and confidently.</li>
+        </ul>
+
+        <div class="welcome-cards">
+          <div class="card">
+            <h3>Start Exploring</h3>
+            <p>Select your category and zone to begin.</p>
+          </div>
+          <div class="card">
+            <h3>Search Documents</h3>
+            <p>Use filters or keywords to find what you need.</p>
+          </div>
+          <div class="card">
+            <h3>Need Help?</h3>
+            <p>Contact support or view the user guide.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="filters" id="filters" style="display:none;">
+        <div class="breadcrumb" id="breadcrumb"></div>
+        <select id="stateSelect" onchange="loadBranches()">
+          <option value="">Select Region</option>
+        </select>
+        <select id="docTypeSelect" onchange="loadCaseTypes()">
+          <option value="">Select Property Type</option>
+        </select>
+        <select id="caseTypeSelect" onchange="loadDocs()">
+          <option value="">Select Case Type</option>
+        </select>
+        <input type="text" id="searchBar" placeholder="Search documents..." onkeyup="searchDocs()" />
+        <button onclick="window.print()" style="margin-left:10px;padding:8px;border:none;background:var(--accent);color:white;border-radius:5px;cursor:pointer;">Print</button>
+      </div>
+
+      <div id="docContent" class="doc-section"></div>
+      <div id="docContent2" class="doc-section cluster-deviation"></div>
+    </div>
+  </div>
+
+<script>
+const locationData = {
+  "Legal": {
+    "North": {
+      "Uttar Pradesh": {
+        "Uttar Pradesh Legal Cluster": {}
+      },
+      "Uttarakhand": {
+        "Uttarakhand Legal Cluster": {}
+      },
+      "Rajasthan": {
+        "Rajasthan Legal Cluster": {}
+      },
+      "Delhi": {
+        "Delhi-1 Legal Cluster": {},
+        "Delhi-2 Legal Cluster": {},
+        "Delhi-3 Legal Cluster": {},
+        "Delhi-4 Legal Cluster": {}
+      },
+      "Haryana": {
+        "Haryana Legal Cluster": {}
+      },
+      "Punjab": {
+        "Punjab Legal Cluster": {}
+      }
+    },
+    "West": {
+      "Gujarat": {
+        "Gujarat Legal Cluster": {}
+      },
+      "Maharashtra": {
+        "Aurangabad Legal Cluster": {},
+        "Nagpur Legal Cluster": {},
+        "Pune Legal Cluster": {},
+        "Nashik Legal Cluster": {},
+        "Mumbai Legal Cluster": {}
+      },
+      "Madhya Pradesh": {
+        "Madhya Pradesh Legal Cluster": {}
+      }
+    },
+    "South": {
+      "Andhra Pradesh": {
+        "Andhra Pradesh Legal Cluster": {}
+      },
+      "Tamil Nadu": {
+        "Tamil Nadu Legal Cluster": {}
+      },
+      "Telangana": {
+        "Telangana Legal Cluster": {}
+      }
+    }
+  },
+  "Technical": {
+    "North": {
+      "Uttar Pradesh": {
+        "Uttar Pradesh Tech Cluster": {}
+      },
+      "Uttarakhand": {
+        "Uttarakhand Tech Cluster": {}
+      },
+      "Rajasthan": {
+        "Rajasthan Tech Cluster": {}
+      },
+      "Delhi": {
+        "Delhi-1 Tech Cluster": {},
+        "Delhi-2 Tech Cluster": {},
+        "Delhi-3 Tech Cluster": {},
+        "Delhi-4 Tech Cluster": {}
+      },
+      "Haryana": {
+        "Haryana Tech Cluster": {}
+      },
+      "Punjab": {
+        "Punjab Tech Cluster": {}
+      }
+    },
+    "West": {
+      "Gujarat": {
+        "Gujarat Tech Cluster": {}
+      },
+      "Maharashtra": {
+        "Aurangabad Tech Cluster": {},
+        "Nagpur Tech Cluster": {},
+        "Pune Tech Cluster": {},
+        "Nashik Tech Cluster": {},
+        "Mumbai Tech Cluster": {}
+      },
+      "Madhya Pradesh": {
+        "Madhya Pradesh Tech Cluster": {}
+      }
+    },
+    "South": {
+      "Andhra Pradesh": {
+        "Andhra Pradesh Tech Cluster": {}
+      },
+      "Tamil Nadu": {
+        "Tamil Nadu Tech Cluster": {}
+      },
+      "Telangana": {
+        "Telangana Tech Cluster": {}
+      }
+    }
+  }
+};
+
+
+
+const docStructure = {
+  // Legal Documents
+
+  "Pune Legal Cluster": {
+    "Residencial Zone Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Mutation Entries / Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill (not required if 13 years chain deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. Zone Certificate",
+        "6. Society Registration Certificate (if any) / Deed of Declaration",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. Zone Certificate",
+        "6. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry",
+        "3. DA/ POA/ Sale Deed of builder",
+        "4. Flat Bifurcation List  (if bifurcation between landowner / builder for flats to be constructed )",
+        "5. Zone Certificate",
+        "6. Partnership Deed of Builder",
+        "7. Previous title Deeds for 13 years",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Title Registered Deed of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill (not required if 13 years chain deeds avaiaible)",
+        "5. Zone Certificate",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property Involved",
+        "9. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "10. Share Certificate in case of Society is formed",
+        "11. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Title Deed of Seller",
+        "4. PTR/ E Bill",
+        "5. Zone Certificate",
+        "6. Previous chain deeds if any  for last 13 years",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Sheti Na Vikas (Agricultural no Development) Zone Property": {
+      "LAP/Self-Construction": [
+        "1. No Self Construction case in Sheti na Vikas Zone",
+        "2. Registered Title Deed of Borrower",
+        "3. 7/12 Extract / Namuna / Mutation Entries / Revenue Record in the name of Borrower",
+        "4. PTR/ E Bill (not required if 13 years chain deeds avaiaible)",
+        "5. Previous Title chain Deeds",
+        "6. Zone Certificate",
+        "7. RM to be done",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. Zone Certificate",
+        "6. RM to be done",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Title Registered Deed of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill (not required if 13 years chain deeds avaiaible)",
+        "5. Zone Certificate",
+        "6. RM to be Done",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Title Deed of Seller",
+        "4. PTR/ E Bill",
+        "5. Zone Certificate",
+        "6. Previous chain deeds if any  for last 13 years",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Namuna Property": {
+      "LAP/Self-Construction": [
+        "1. Old / New Namuna 8/Assessment Abstract for 13 years",
+        "2. Tax Receipt",
+        "3. Four Boundary Certificate",
+        "4. Gaothan Certificate",
+        "5. NOC of Gram Panchayat",
+        "6. Ancestral Property/Ferfar Certificate / Ownership Certificate",
+        "7. Draft of Gift Deed / Registered Gift Deed / Draft of Release Deed",
+        "8. Old and New House no. Certificate from Gram Panchayat",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Old / New Namuna 8/Assessment Abstract for last 5 years",
+        "2. Tax Receipt",
+        "3. Four Boundary Certificate",
+        "4. Gaothan Certificate",
+        "5. NOC of Gram Panchayat",
+        "6. Ancestral Property/Ferfar Certificate",
+        "7. Old and New House no. Certificate from Gram Panchayat",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS",
+        "2. Old / New Namuna 8/Assessment Abstract for last 13 years",
+        "3. Four Boundary Certificate",
+        "4. Gaonthan Certificate",
+        "5. Ancestral Property/Ferfar Certificate / Ownership Certificat",
+        "6. Previous chain deeds for last 13 years",
+        "7. DA/ POA in favor of Builder",
+        "8. Flat Bifurcation List  (if bifurcation between landowner / builder for flats to be constructed )",
+        "9. Partnership Deed of Builder",
+        "10. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "11. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "12. Court permission in case of Minor property Involved",
+        "13. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "14. Share Certificate in case of Society is formed",
+        "15. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD from BT bank",
+        "2. Tax Receipt",
+        "3. Four Boundary Certificate",
+        "4. Gaothan Certificate",
+        "5. NOC of Gram Panchayat",
+        "6. Previous chain deeds if any",
+        "7. Registered title deed of borrower",
+        "8. Old and New House no. Certificate from Gram Panchayat",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD from BT bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered title deed of Seller",
+        "4. Previous chain deeds if any",
+        "5. Gaonthan Certificate",
+        "6. Four boundary Certificate",
+        "7. old and New House no. Certificate from Gram Panchayat",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "MHADA, PCNTDA, PMRDA, MIDC": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower i.e. Lease Deed  / Sale Deed",
+        "2. Allotment Letter in the name of Borrower",
+        "3. PTR/ E Bill (not required if deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. NOC from Authority to be taken",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property Involved",
+        "9. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "10. Share Certificate in case of Society is formed",
+        "11. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower i.e. Lease Deed / Sale Deed",
+        "2. Allotment Letter in the name of Borrower",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds",
+        "5. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "6. NOC from Authority to be taken",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. Draft of ATS in name of Borrower",
+        "2. Allotment Letter issued by Authority",
+        "3. Payment Receipt issued by Authority",
+        "4. Transfer Certificate (if any)",
+        "5. NOC to Sale / Mortgage by Authority",
+        "6. RERA Certificate",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD from BT bank",
+        "2. Registered Deed of Borrower",
+        "3. NOC from Authority",
+        "4. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "5. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "6. Court permission in case of Minor property Involved",
+        "7. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "8. Share Certificate in case of Society is formed",
+        "9. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD from BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered title Deed of Seller",
+        "4. Allotment Letter issued by Authrity",
+        "5. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "6. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "7. Court permission in case of Minor property Involved",
+        "8. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "9. Share Certificate in case of Society is formed",
+        "10. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Prime Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Mutation Entries / Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill (not required if 13 years chain deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. N A Order / Commencemnt Certificate by PMC",
+        "6. Society Registration Certificate (if any) / Deed of Declaration",
+        "7. Completion Certificate issued by Authority",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property Involved",
+        "9. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "10. Share Certificate in case of Society is formed",
+        "11. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry",
+        "3. DA/ POA/ Sale Deed of builder",
+        "4. Flat Bifurcation List  (if bifurcation between landowner / builder for flats to be constructed )",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. Partnership Deed of Builder",
+        "7. Previous title Deeds for 13 years",
+        "8. RERA Certificate",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Title Registered Deed of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill (not required if 13 years chain deeds avaiaible)",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property Involved",
+        "9. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "10. Share Certificate in case of Society is formed",
+        "11. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Title Deed of Seller",
+        "4. PTR/ E Bill",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. Previous chain deeds if any  for last 13 years",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Auction Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Sale Certificate of Borrower",
+        "2. 7/12 Extract / Namuna / Mutation Entries / Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill (not required if 13 years chain deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. Zone Certificate",
+        "6. Society Registration Certificate (if any) / Deed of Declaration",
+        "7. Bid /Auction Confirmation Letter",
+        "8. DM Order under SARFASI ACT",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Sale Certificate of Borrower",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. Zone Certificate",
+        "6. Bid /Auction Confirmation Letter",
+        "7. DM Order under SARFASI ACT",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. Draft of Sale Certificate",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry",
+        "3. Bid /Auction Confirmation Letter",
+        "4. DM Order",
+        "5. Zone Certificate",
+        "6. Paper Publication",
+        "7. Previous title Deeds for 13 years",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Registered Sale Certificate of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill",
+        "5. Zone Certificate",
+        "6. Bid /Auction Confirmation Letter",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Sale Certificate of Seller",
+        "4. PTR/ E Bill",
+        "5. Zone Certificate",
+        "6. Bid /Auction Confirmation Letter",
+        "7. Previous chain deeds if any  for last 13 years",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    }
+  },
+  "Nagpur Legal Cluster": {
+    "Society allotted Plot Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Akhiv Patrika / Mutation Entries / Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Society Registration Certificate",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Akhiv Patrika / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "6. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "7. COURT PERMISSION IN CASE OF MINOR PROPERTY INVOLVED",
+        "8. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "9. Share Certificate in case of Society is formed",
+        "10. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS / Sale Deed",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry / Akhiv Patrika",
+        "3. DA/ POA/ Sale Deed of builder / seller",
+        "4. Flat Bifurcation List  (if bifurcation between landowner society/ builder for flats to be constructed )",
+        "5. Partnership Deed of Builder",
+        "6. Previous title Deeds for 13 years",
+        "7. Layout Plan / Regularization Certificate",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. COURT PERMISSION IN CASE OF MINOR PROPERTY INVOLVED",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Title Registered Deed of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "5. Layout Plan / Regularization Certificate",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "8. COURT PERMISSION IN CASE OF MINOR PROPERTY INVOLVED",
+        "9. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "10. Share Certificate in case of Society is formed",
+        "11. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Title Deed of Seller",
+        "4. PTR/ E Bill",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Previous chain deeds if any  for last 13 years",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. COURT PERMISSION IN CASE OF MINOR PROPERTY INVOLVED",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Namuna Property": {
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Akhiv Patrika / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "6. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "7. Court permission in case of Minor property Involved",
+        "8. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "9. Share Certificate in case of Society is formed",
+        "10. DEED OF APARTMENT IN FAVOR OF CURRENT OWNER IN CASE OF APARTMENT CONDOMINIUM FORMED / REGISTERED DEED OF DECLARATION"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS / Sale Deed",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry / Akhiv Patrika",
+        "3. DA/ POA/ Sale Deed of builder / seller",
+        "4. Flat Bifurcation List  (if bifurcation between landowner society/ builder for flats to be constructed )",
+        "5. Partnership Deed of Builder",
+        "6. Previous title Deeds for 13 years",
+        "7. Layout Plan / Regularization Certificate",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Title Registered Deed of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "5. Layout Plan / Regularization Certificate",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property Involved",
+        "9. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "10. Share Certificate in case of Society is formed",
+        "11. DEED OF APARTMENT IN FAVOR OF CURRENT OWNER IN CASE OF APARTMENT CONDOMINIUM FORMED / REGISTERED DEED OF DECLARATION"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Title Deed of Seller",
+        "4. PTR/ E Bill",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Previous chain deeds if any  for last 13 years",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. DEED OF APARTMENT IN FAVOR OF CURRENT OWNER IN CASE OF APARTMENT CONDOMINIUM FORMED / REGISTERED DEED OF DECLARATION"
+      ]
+    },
+    "Govt. allotted properties like MHADA, NIT, MIDC": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower i.e. Lease Deed  / Sale Deed",
+        "2. Allotment Letter in the name of Borrower",
+        "3. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. NOC from Authority to be taken",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property Involved",
+        "9. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "10. Share Certificate in case of Society is formed",
+        "11. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower i.e. Lease Deed / Sale Deed",
+        "2. Allotment Letter in the name of Borrower",
+        "3. PTR/ E BILL",
+        "4. Previous Title chain Deeds",
+        "5. NOC from Authority to be taken",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property Involved",
+        "9. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "10. Share Certificate in case of Society is formed",
+        "11. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. Draft of ATS in name of Borrower",
+        "2. Allotment Letter issued by Authority",
+        "3. Payment Receipt issued by Authority",
+        "4. Transfer Certificate (if any)",
+        "5. NOC TO SALE / MORTGAGE BY AUTHORITY",
+        "6. RERA Certificate",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD from BT bank",
+        "2. Registered Deed of Borrower",
+        "3. NOC from Authority",
+        "4. PTR/ E Bill (not required if 13 years chain deeds avaiaible)",
+        "5. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "6. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "7. Court permission in case of Minor property Involved",
+        "8. IN CASE IF DEATH OF PROPERTY OWNER - DEATH CERTIFICATE OF PROPERTY OWNER / LEGAL HEIRS AFFIDAVIT OF DEATH PERSON",
+        "9. Share Certificate in case of Society is formed",
+        "10. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD from BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered title Deed of Seller",
+        "4. Allotment Letter issued by Authrity",
+        "5. NOC to trasnfer",
+        "6. transfer Certificate",
+        "7. PTR/ E Bill",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Prime Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Mutation Entries / Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. N A Order / Commencemnt Certificate by PMC",
+        "6. Society Registration Certificate (if any) / Deed of Declaration",
+        "7. Completion Certificate issued by Authority",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property Involved",
+        "9. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "10. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "11. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry",
+        "3. DA/ POA/ Sale Deed of builder",
+        "4. Flat Bifurcation List  (if bifurcation between landowner / builder for flats to be constructed )",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. Partnership Deed of Builder",
+        "7. Previous title Deeds for 13 years",
+        "8. RERA Certificate",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. COURT PERMISSION IN CASE OF MINOR PROPERTY INVOLVED",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Title Registered Deed of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property Involved",
+        "9. IN CASE IF DEATH OF PROPERTY OWNER - DEATH CERTIFICATE OF PROPERTY OWNER / LEGAL HEIRS AFFIDAVIT OF DEATH PERSON",
+        "10. Share Certificate in case of Society is formed",
+        "11. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Title Deed of Seller",
+        "4. PTR/ E Bill",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. Previous chain deeds if any  for last 13 years",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Auction Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Sale Certificate of Borrower",
+        "2. 7/12 Extract / Namuna / Mutation Entries / Akhiv Patrika/ Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. LAYOUT PLAN / REGULARIZATION CERTIFICATE",
+        "6. Society Registration Certificate (if any) / Deed of Declaration",
+        "7. DM Order under SARFASI ACT",
+        "8. Bid /Auction Confirmation Letter",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Sale Certificate of Borrower",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. PREVIOUS TITLE CHAIN DEEDS WITHIN 5 YEARS",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Bid /Auction Confirmation Letter",
+        "7. DM Order",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. Draft of Sale Certificate",
+        "2. 7/12 EXTRACT /PROPERTY CARD EXTRACT / MUTATION ENTRY",
+        "3. Bid /Auction Confirmation Letter",
+        "4. DM Order",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Paper Publication",
+        "7. Previous title Deeds for 13 years",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Registered Sale Certificate of Borrower",
+        "3. PREVIOUS CHAIN DEEDS IF ANY",
+        "4. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Bid /Auction Confirmation Letter",
+        "7. DM Order",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD OF BT BANK",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Sale Certificate of Seller",
+        "4. PTR/ E Bill",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Bid /Auction Confirmation Letter",
+        "7. Previous chain deeds if any  for last 13 years",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    }
+  },
+  "Aurangabad Legal Cluster": {
+    "Namuna Property": {
+      "LAP/Self-Construction": [
+        "1. Old / New Namuna 8/Assessment Abstract for 13 years",
+        "2. Tax Receipt",
+        "3. Four Boundary Certificate",
+        "4. Gaothan Certificate",
+        "5. NOC of Gram Panchayat",
+        "6. Ancestral Property/Ferfar Certificate / Ownership Certificate",
+        "7. DRAFT OF GIFT DEED / REGISTERED GIFT DEED / DRAFT OF RELEASE DEED",
+        "8. Old and New House no. Certificate from Gram Panchayat",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Old / New Namuna 8/Assessment Abstract for last 5 years",
+        "2. Tax Receipt",
+        "3. Four Boundary Certificate",
+        "4. Gaothan Certificate",
+        "5. NOC OF GRAM PANCHAYAT",
+        "6. Ancestral Property/Ferfar Certificate",
+        "7. Old and New House no. Certificate from Gram Panchayat",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS",
+        "2. Old / New Namuna 8/Assessment Abstract for last 13 years",
+        "3. Four Boundary Certificate",
+        "4. Gaonthan Certificate",
+        "5. ANCESTRAL PROPERTY/FERFAR CERTIFICATE / OWNERSHIP CERTIFICAT",
+        "6. Previous chain deeds for last 13 years / Seller registered Sale Deed",
+        "7. DA/ POA in favor of Builder / Seller",
+        "8. Flat Bifurcation List  (if bifurcation between landowner / builder for flats to be constructed )",
+        "9. Partnership Deed of Builder",
+        "10. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "11. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "12. Court permission in case of Minor property Involved",
+        "13. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "14. Share Certificate in case of Society is formed",
+        "15. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD FROM BT BANK",
+        "2. Tax Receipt",
+        "3. Four Boundary Certificate",
+        "4. Gaothan Certificate",
+        "5. NOC of Gram Panchayat",
+        "6. Previous chain deeds if any",
+        "7. Registered title deed of borrower",
+        "8. Old and New House no. Certificate from Gram Panchayat",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD from BT bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered title deed of Seller",
+        "4. Previous chain deeds if any",
+        "5. Gaonthan Certificate",
+        "6. Four boundary Certificate",
+        "7. old and New House no. Certificate from Gram Panchayat",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Govt. allotted properties like MHADA, CIDCO, MIDC": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower i.e. Lease Deed  / Sale Deed",
+        "2. Allotment Letter in the name of Borrower",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds",
+        "5. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "6. NOC from Authority to be taken",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower i.e. Lease Deed / Sale Deed",
+        "2. Allotment Letter in the name of Borrower",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds",
+        "5. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "6. NOC from Authority to be taken",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. Draft of ATS in name of Borrower",
+        "2. Allotment Letter issued by Authority",
+        "3. Payment Receipt issued by Authority",
+        "4. Transfer Certificate (if any)",
+        "5. NOC to Sale / Mortgage by Authority",
+        "6. RERA Certificate",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD from BT bank",
+        "2. Registered Deed of Borrower",
+        "3. NOC from Authority",
+        "4. PTR/ E Bill",
+        "5. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "6. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "7. Court permission in case of Minor property Involved",
+        "8. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "9. Share Certificate in case of Society is formed",
+        "10. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD from BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. REGISTERED TITLE DEED OF SELLER",
+        "4. Allotment Letter issued by Authrity",
+        "5. NOC to trasnfer",
+        "6. transfer Certificate",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Prime Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Mutation Entries / Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill",
+        "4. PREVIOUS TITLE CHAIN DEEDS",
+        "5. N A Order / Commencemnt Certificate by PMC",
+        "6. Society Registration Certificate (if any) / Deed of Declaration",
+        "7. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "8. Completion Certificate issued by Authority",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. NA ORDER / COMMENCEMENT CERTIFICATE / COMPLETION CERTIFICATE",
+        "6. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry",
+        "3. DA/ POA/ Sale Deed of builder",
+        "4. Flat Bifurcation List  (if bifurcation between landowner / builder for flats to be constructed )",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. Partnership Deed of Builder",
+        "7. PREVIOUS TITLE DEEDS FOR 13 YEARS",
+        "8. RERA Certificate",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Title Registered Deed of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. DEATH CERTIFICATE OF PROPERTY OWNER / LEGAL HEIRS AFFIDAVIT OF DEATH PERSON",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Title Deed of Seller",
+        "4. PTR/ E Bill",
+        "5. NA ORDER / COMMENCEMENT CERTIFICATE / COMPLETION CERTIFICATE",
+        "6. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "7. Previous chain deeds if any  for last 13 years",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Auction Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Sale Certificate of Borrower",
+        "2. 7/12 Extract / Namuna / Mutation Entries / Akhiv Patrika/ Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill",
+        "4. PREVIOUS TITLE CHAIN DEEDS",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Society Registration Certificate (if any) / Deed of Declaration",
+        "7. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "8. Bid /Auction Confirmation Letter",
+        "9. DM Order under SARFASI ACT",
+        "10. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "11. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "12. Court permission in case of Minor property Involved",
+        "13. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "14. Share Certificate in case of Society is formed",
+        "15. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. REGISTERED SALE CERTIFICATE OF BORROWER",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "7. Bid /Auction Confirmation Letter",
+        "8. DM Order",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. CURRENT ORDER / EXH. 1 PLAINT IN CASE OF LITIGATION IS PENDING AND/OR DISPOSSED OFF",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. Draft of Sale Certificate",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry",
+        "3. Bid /Auction Confirmation Letter",
+        "4. DM Order",
+        "5. Layout Plan / Regularization Certificate",
+        "6. PAPER PUBLICATION",
+        "7. Previous title Deeds for 13 years",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Registered Sale Certificate of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill",
+        "5. Layout Plan / Regularization Certificate",
+        "6. DEATH CERTIFICATE OF PROPERTY OWNER / LEGAL HEIRS AFFIDAVIT OF DEATH PERSON",
+        "7. Bid /Auction Confirmation Letter",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Sale Certificate of Seller",
+        "4. PTR/ E BILL",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "7. Previous chain deeds if any  for last 13 years",
+        "8. Bid /Auction Confirmation Letter",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    }
+  },
+  "Nashik Legal Cluster": {
+    "Namuna Property": {
+      "LAP/Self-Construction": [
+        "1. Old / New Namuna 8/Assessment Abstract for 13 years",
+        "2. Tax Receipt",
+        "3. Four Boundary Certificate",
+        "4. GAOTHAN CERTIFICATE",
+        "5. NOC of Gram Panchayat",
+        "6. Ancestral Property/Ferfar Certificate / Ownership Certificate",
+        "7. Draft of Gift Deed / Registered Gift Deed / Draft of Release Deed",
+        "8. Old and New House no. Certificate from Gram Panchayat",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. OLD / NEW NAMUNA 8/ASSESSMENT ABSTRACT FOR LAST 5 YEARS",
+        "2. Tax Receipt",
+        "3. Four Boundary Certificate",
+        "4. Gaothan Certificate",
+        "5. NOC of Gram Panchayat",
+        "6. Ancestral Property/Ferfar Certificate",
+        "7. Old and New House no. Certificate from Gram Panchayat",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS",
+        "2. Old / New Namuna 8/Assessment Abstract for last 13 years",
+        "3. Four Boundary Certificate",
+        "4. Gaonthan Certificate",
+        "5. Ancestral Property/Ferfar Certificate / Ownership Certificat",
+        "6. Previous chain deeds for last 13 years / Seller registered Sale Deed",
+        "7. DA/ POA in favor of Builder / Seller",
+        "8. Flat Bifurcation List  (if bifurcation between landowner / builder for flats to be constructed )",
+        "9. Partnership Deed of Builder",
+        "10. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "11. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "12. Court permission in case of Minor property Involved",
+        "13. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "14. Share Certificate in case of Society is formed",
+        "15. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD from BT bank",
+        "2. Tax Receipt",
+        "3. Four Boundary Certificate",
+        "4. Gaothan Certificate",
+        "5. NOC of Gram Panchayat",
+        "6. Previous chain deeds if any",
+        "7. Registered title deed of borrower",
+        "8. Old and New House no. Certificate from Gram Panchayat",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD from BT bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered title deed of Seller",
+        "4. Previous chain deeds if any",
+        "5. Gaonthan Certificate",
+        "6. Four boundary Certificate",
+        "7. old and New House no. Certificate from Gram Panchayat",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Govt. allotted properties like MHADA, CIDCO, MIDC": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower i.e. Lease Deed  / Sale Deed",
+        "2. Allotment Letter in the name of Borrower",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds",
+        "5. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "6. NOC from Authority to be taken",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower i.e. Lease Deed / Sale Deed",
+        "2. Allotment Letter in the name of Borrower",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds",
+        "5. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "6. NOC from Authority to be taken",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. Draft of ATS in name of Borrower",
+        "2. Allotment Letter issued by Authority",
+        "3. Payment Receipt issued by Authority",
+        "4. Transfer Certificate (if any)",
+        "5. NOC to Sale / Mortgage by Authority",
+        "6. RERA Certificate",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD from BT bank",
+        "2. Registered Deed of Borrower",
+        "3. NOC from Authority",
+        "4. PTR/ E Bill",
+        "5. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "6. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "7. Court permission in case of Minor property Involved",
+        "8. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "9. Share Certificate in case of Society is formed",
+        "10. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD from BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered title Deed of Seller",
+        "4. Allotment Letter issued by Authrity",
+        "5. NOC to trasnfer",
+        "6. transfer Certificate",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Prime Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Mutation Entries / Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds",
+        "5. N A Order / Commencemnt Certificate by PMC",
+        "6. Society Registration Certificate (if any) / Deed of Declaration",
+        "7. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "8. Completion Certificate issued by Authority",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry",
+        "3. DA/ POA/ Sale Deed of builder",
+        "4. Flat Bifurcation List  (if bifurcation between landowner / builder for flats to be constructed )",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. Partnership Deed of Builder",
+        "7. Previous title Deeds for 13 years",
+        "8. RERA Certificate",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Title Registered Deed of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property Involved",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Title Deed of Seller",
+        "4. PTR/ E Bill",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "7. Previous chain deeds if any  for last 13 years",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Auction Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Sale Certificate of Borrower",
+        "2. 7/12 Extract / Namuna / Mutation Entries / Akhiv Patrika/ Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Society Registration Certificate (if any) / Deed of Declaration",
+        "7. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "8. Bid /Auction Confirmation Letter",
+        "9. DM Order under SARFASI ACT",
+        "10. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "11. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "12. Court permission in case of Minor property Involved",
+        "13. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "14. Share Certificate in case of Society is formed",
+        "15. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Sale Certificate of Borrower",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "7. Bid /Auction Confirmation Letter",
+        "8. DM Order",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. Draft of Sale Certificate",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry",
+        "3. Bid /Auction Confirmation Letter",
+        "4. DM Order",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Paper Publication",
+        "7. Previous title Deeds for 13 years",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Registered Sale Certificate of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "7. Bid /Auction Confirmation Letter",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property Involved",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Sale Certificate of Seller",
+        "4. PTR/ E Bill",
+        "5. Layout Plan / Regularization Certificate",
+        "6. Death Certificate of property owner / Legal heirs affidavit of death person",
+        "7. Previous chain deeds if any  for last 13 years",
+        "8. Bid /Auction Confirmation Letter",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case of Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property Involved",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    }
+  },
+  "Mumbai Legal Cluster": {
+    "GP / Gaonthan Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed / ATS of Borrower",
+        "2. 7/12 Extract / Assessment Extract / Mutation Entries",
+        "3. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. DA/POA of Builder",
+        "6. Society Registration Certificate (if any) / Deed of Declaration",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property invloved",
+        "10. Builder should be consenting Party if previous chain is Notary",
+        "11. Confirmation on Builder NOC / Society NOC",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Assessment Extract / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "6. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "7. Court permission in case of Minor property invloved",
+        "8. Builder should be consenting Party if previous chain is Notary",
+        "9. Confirmation on Builder NOC / Society NOC",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry",
+        "3. DA/ POA/ Sale Deed of builder",
+        "4. Flat Bifurcation List  (if bifurcation between landowner / builder for flats to be constructed )",
+        "5. Partnership Deed of Builder",
+        "6. PREVIOUS TITLE DEEDS FOR 13 YEARS",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property invloved",
+        "10. Builder should be consenting Party if previous chain is Notary",
+        "11. Confirmation on Builder NOC / Society NOC",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Title Registered Deed of Borrower",
+        "3. PREVIOUS CHAIN DEEDS IF ANY",
+        "4. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "5. Confirmation on Builder NOC / Society NOC",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property invloved",
+        "9. Builder should be consenting Party if previous chain is Notary",
+        "10. Confirmation on Builder NOC / Society NOC",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. DRAFT OF ATS OF BORROWER",
+        "3. Registered Title Deed of Seller",
+        "4. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "5. Previous chain deeds if any  for last 13 years",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property invloved",
+        "9. Builder should be consenting Party if previous chain is Notary",
+        "10. Confirmation on Builder NOC / Society NOC",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Govt. allotted properties like MHADA, SRA, MIDC, CIDCO": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower i.e. Lease Deed  / Sale Deed",
+        "2. ALLOTMENT LETTER IN THE NAME OF BORROWER",
+        "3. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. NOC from Authority to be taken",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property invloved",
+        "9. Builder should be consenting Party if previous chain is Notary",
+        "10. Confirmation on Builder NOC / Society NOC",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. REGISTERED TITLE DEED OF BORROWER I.E. LEASE DEED / SALE DEED",
+        "2. Allotment Letter in the name of Borrower",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds",
+        "5. NOC from Authority to be taken",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property invloved",
+        "9. Builder should be consenting Party if previous chain is Notary",
+        "10. Confirmation on Builder NOC / Society NOC",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. DEED OF APARTMENT IN FAVOR OF CURRENT OWNER IN CASE OF APARTMENT CONDOMINIUM FORMED / REGISTERED DEED OF DECLARATION"
+      ],
+      "HL Purchase/P+C": [
+        "1. Draft of ATS in name of Borrower",
+        "2. Allotment Letter issued by Authority",
+        "3. Payment Receipt issued by Authority",
+        "4. Transfer Certificate (if any)",
+        "5. NOC to Sale / Mortgage by Authority",
+        "6. RERA Certificate",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property invloved",
+        "10. Builder should be consenting Party if previous chain is Notary",
+        "11. Confirmation on Builder NOC / Society NOC",
+        "12. IN CASE IF DEATH OF PROPERTY OWNER - DEATH CERTIFICATE OF PROPERTY OWNER / LEGAL HEIRS AFFIDAVIT OF DEATH PERSON",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD from BT bank",
+        "2. Registered Deed of Borrower",
+        "3. NOC from Authority",
+        "4. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "5. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "6. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "7. Court permission in case of Minor property invloved",
+        "8. Builder should be consenting Party if previous chain is Notary",
+        "9. Confirmation on Builder NOC / Society NOC",
+        "10. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "11. Share Certificate in case of Society is formed",
+        "12. DEED OF APARTMENT IN FAVOR OF CURRENT OWNER IN CASE OF APARTMENT CONDOMINIUM FORMED / REGISTERED DEED OF DECLARATION"
+      ],
+      "Seller BT": [
+        "1. LOD from BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered title Deed of Seller",
+        "4. Allotment Letter issued by Authrity",
+        "5. NOC to trasnfer",
+        "6. PTR/ E Bill",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property invloved",
+        "10. Builder should be consenting Party if previous chain is Notary",
+        "11. Confirmation on Builder NOC / Society NOC",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Prime Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Mutation Entries / Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. N A Order / Commencemnt Certificate by PMC",
+        "6. Society Registration Certificate (if any) / Deed of Declaration",
+        "7. Completion Certificate issued by Authority",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property invloved",
+        "11. Builder should be consenting Party if previous chain is Notary",
+        "12. Confirmation on Builder NOC / Society NOC",
+        "13. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "14. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "15. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Title Deed of Borrower",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property invloved",
+        "9. Builder should be consenting Party if previous chain is Notary",
+        "10. Confirmation on Builder NOC / Society NOC",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. DEED OF APARTMENT IN FAVOR OF CURRENT OWNER IN CASE OF APARTMENT CONDOMINIUM FORMED / REGISTERED DEED OF DECLARATION"
+      ],
+      "HL Purchase/P+C": [
+        "1. ATS / Draft of ATS",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry",
+        "3. DA/ POA/ Sale Deed of builder",
+        "4. Flat Bifurcation List  (if bifurcation between landowner / builder for flats to be constructed )",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. Partnership Deed of Builder",
+        "7. Previous title Deeds for 13 years",
+        "8. RERA Certificate",
+        "9. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "10. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "11. Court permission in case of Minor property invloved",
+        "12. Builder should be consenting Party if previous chain is Notary",
+        "13. CONFIRMATION ON BUILDER NOC / SOCIETY NOC",
+        "14. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "15. Share Certificate in case of Society is formed",
+        "16. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Title Registered Deed of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "8. COURT PERMISSION IN CASE OF MINOR PROPERTY INVLOVED",
+        "9. Builder should be consenting Party if previous chain is Notary",
+        "10. Confirmation on Builder NOC / Society NOC",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Title Deed of Seller",
+        "4. PTR/ E Bill",
+        "5. NA Order / Commencement Certificate / Completion Certificate",
+        "6. Previous chain deeds if any  for last 13 years",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property invloved",
+        "10. Builder should be consenting Party if previous chain is Notary",
+        "11. Confirmation on Builder NOC / Society NOC",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    },
+    "Auction Property": {
+      "LAP/Self-Construction": [
+        "1. Registered Sale Certificate of Borrower",
+        "2. 7/12 Extract / Namuna / Mutation Entries / Revenue Record in the name of Borrower",
+        "3. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "4. Previous Title chain Deeds",
+        "5. SOCIETY REGISTRATION CERTIFICATE (IF ANY) / DEED OF DECLARATION",
+        "6. DM Order under SARFASI ACT",
+        "7. Bid /Auction Confirmation Letter",
+        "8. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "9. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "10. Court permission in case of Minor property invloved",
+        "11. Builder should be consenting Party if previous chain is Notary",
+        "12. Confirmation on Builder NOC / Society NOC",
+        "13. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "14. SHARE CERTIFICATE IN CASE OF SOCIETY IS FORMED",
+        "15. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Shubh Vikas": [
+        "1. Registered Sale Certificate of Borrower",
+        "2. 7/12 Extract / Namuna / Revenue Record for last 5 years",
+        "3. PTR/ E Bill",
+        "4. Previous Title chain Deeds within 5 years",
+        "5. DM Order under SARFASI ACT",
+        "6. Bid /Auction Confirmation Letter",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "9. COURT PERMISSION IN CASE OF MINOR PROPERTY INVLOVED",
+        "10. Builder should be consenting Party if previous chain is Notary",
+        "11. Confirmation on Builder NOC / Society NOC",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "HL Purchase/P+C": [
+        "1. Draft of Sale Certificate",
+        "2. 7/12 Extract /Property Card Extract / Mutation Entry",
+        "3. Bid /Auction Confirmation Letter",
+        "4. DM Order",
+        "5. Paper Publication",
+        "6. Previous title Deeds for 13 years",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. CURRENT ORDER / EXH. 1 PLAINT IN CASE LITIGATION IS PENDING AND/OR DISPOSSED OFF",
+        "9. Court permission in case of Minor property invloved",
+        "10. Builder should be consenting Party if previous chain is Notary",
+        "11. Confirmation on Builder NOC / Society NOC",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "BT/BT+Top Up": [
+        "1. LOD of BT Bank",
+        "2. Registered Sale Certificate of Borrower",
+        "3. Previous chain deeds if any",
+        "4. PTR/ E Bill  (not required if 13 years chain deeds avaiaible)",
+        "5. BID /AUCTION CONFIRMATION LETTER",
+        "6. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "7. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "8. Court permission in case of Minor property invloved",
+        "9. Builder should be consenting Party if previous chain is Notary",
+        "10. Confirmation on Builder NOC / Society NOC",
+        "11. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "12. Share Certificate in case of Society is formed",
+        "13. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ],
+      "Seller BT": [
+        "1. LOD of BT Bank",
+        "2. Draft of ATS of Borrower",
+        "3. Registered Sale Certificate of Seller",
+        "4. PTR/ E Bill",
+        "5. Bid /Auction Confirmation Letter",
+        "6. PREVIOUS CHAIN DEEDS IF ANY  FOR LAST 13 YEARS",
+        "7. ADDITIONAL CLARIFICATION / DOCUMENTS / NOTE ARE BELOW MENTIONED:",
+        "8. Current Order / Exh. 1 Plaint in case Litigation is pending and/or dispossed off",
+        "9. Court permission in case of Minor property invloved",
+        "10. Builder should be consenting Party if previous chain is Notary",
+        "11. Confirmation on Builder NOC / Society NOC",
+        "12. In case if death of property owner - Death Certificate of property owner / Legal heirs affidavit of death person",
+        "13. Share Certificate in case of Society is formed",
+        "14. Deed of Apartment in favor of Current Owner in case of Apartment Condominium formed / registered Deed of Declaration"
+      ]
+    }
+  },
+
+  // Technical Documents
+  "Uttar Pradesh Tech Cluster": {
+    "Industrial Property": {
+      "Factory Setup": [
+        "1. Land Survey Report",
+        "2. Structural Stability Certificate",
+        "3. Environmental Clearance",
+        "4. Factory Layout Plan"
+      ]
+    }
+  },
+  "Delhi Tech Cluster": {
+    "IT Park": {
+      "Lease": [
+        "1. Building Specifications Document",
+        "2. Electrical Load Details",
+        "3. Fire Safety Certificate",
+        "4. HVAC System Details"
+      ]
+    }
+  },
+  "Mumbai Tech Cluster": {
+    "Warehouse": {
+      "Construction": [
+        "1. Soil Test Report",
+        "2. Structural Design Approval",
+        "3. Material Specifications",
+        "4. Construction Timeline"
+      ]
+    }
+  }
+};
+
+// SIMPLIFIED DEVIATION STRUCTURE (Cluster-level only)
+const secondaryDocStructure = {
+  // Legal Deviations
+  "Uttar Pradesh Legal Cluster": [
+    { document: "Title Verification", status: "Complete", notes: "Clear title verified", date: "2023-05-10" },
+    { document: "Encumbrance Check", status: "Pending", notes: "Waiting for updated EC", date: "2023-05-15" }
+  ],
+    "Pune Legal Cluster": [
+    { document: "chain documents lost", status: "Certified Copy of Deed", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "Indemnity", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "FIR", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "Public Notice for lost of Deeds by Advocate", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "NOC to Public Notice issued by Advocate", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "RM to be done", notes: "ALM / RLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "Certified Copy of Deed which is laminated", notes: "RLM/ NLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "Indemnity", notes: "RLM/ NLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "approval from RLM/ NLM", notes: "RLM/ NLM" },
+    { document: "cheque expired which is already mentioned in Deed", status: "Affidavit from seller / Borrower", notes: "ALM" },
+    { document: "Minor Interest involved", status: "Court permission required for minor property", notes: "RLM/ NLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Death Certificate of borrower / property owner", notes: "ALM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Legal heirs affidavit / Details of all Legal heirs with age", notes: "ALM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Ration Card", notes: "ALM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "all Legal heirs should be on loan struture (including daughter)", notes: "ALM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "Death Certificate of Seller /property owner", notes: "ALM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "Legal heirs affidavit / Details of all Legal heirs with age", notes: "ALM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "all Legal heirs should be stand as seller in Sale Deed of Borrower (including daughter)", notes: "ALM" },
+    { document: "in case of Development Agreement is notarized in Purchase case", status: "POA should be registered", notes: "ALM / RLM" },
+    { document: "in case of Development Agreement is notarized in Purchase case", status: "Flat Bifurcation List should be on record with signature of Landowners and Developer", notes: "ALM / RLM" },
+    { document: "in case of Development Agreement is notarized in Purchase case", status: "ATS should be done by Landowners and Builder should be consenting Party", notes: "ALM / RLM" },
+    { document: "Legal Report expired", status: "get one year additional search done", notes: "ALM" },
+    { document: "Registration Receipt (RR) / Index II of any deed is missing", status: "OK with ALM approval", notes: "ALM" },
+    { document: "If PTR/ E Bill not in the name of Current Owner", status: "get Acknowledgement  to apply copy from respect Govt. Dept", notes: "ALM" },
+    { document: "Small speling mistake in the name of Property owner's Deed and ID", status: "Dual Name affidavit", notes: "ALM / RLM" },
+    { document: "Small speeling mistake in the name of Property owner's Deed and ID", status: "Approval from ALM", notes: "ALM / RLM" },
+    { document: "Pending Litigation on Property", status: "Approval from NLM for pending Litigation", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Current stage of Litigation", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Complete litigation documents i.e. Plaint, Written Statement, Order copy (if any), Final Judgment", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Indemnity from Builder /seller / Borrower", notes: "NLM" }
+  ],
+  "Nagpur Legal Cluster": [
+    { document: "chain documents lost", status: "Certified Copy of Deed", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "Indemnity", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "FIR", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "Public Notice for lost of Deeds by Advocate", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "NOC to Public Notice issued by Advocate", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "RM to be done", notes: "ALM / RLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "Certified Copy of Deed which is laminated", notes: "RLM/ NLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "Indemnity", notes: "RLM/ NLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "approval from RLM/ NLM", notes: "RLM/ NLM" },
+    { document: "cheque expired which is already mentioned in Deed", status: "Affidavit from seller / Borrower", notes: "ALM" },
+    { document: "Minor Interest involved", status: "Court permission required for minor property", notes: "RLM/ NLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Death Certificate of borrower / property owner", notes: "ALM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Legal heirs affidavit / Details of all Legal heirs with age", notes: "ALM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Ration Card", notes: "ALM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "all Legal heirs should be on loan struture (including daughter)", notes: "ALM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "Death Certificate of Seller /property owner", notes: "ALM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "Legal heirs affidavit / Details of all Legal heirs with age", notes: "ALM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "all Legal heirs should be stand as seller in Sale Deed of Borrower (including daughter)", notes: "ALM" },
+    { document: "Legal Report expired", status: "get one year additional search done", notes: "ALM" },
+    { document: "Registration Receipt (RR) / Index II of any deed is missing", status: "OK with ALM approval", notes: "ALM" },
+    { document: "If PTR/ E Bill not in the name of Current Owner", status: "get Acknowledgement  to apply copy from respect Govt. Dept", notes: "ALM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Get Letter from GP for both Milkat No. is for same property", notes: "ALM / RLM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Both (old and New) Milkat No should be mentioned in upcoming registered Deed in purchase case", notes: "ALM / RLM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Both (old and New) Milkat No should be mentioned in RM / Gift deed in LAP / Self Constrution/ BT case", notes: "ALM / RLM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Revenue Record should be available", notes: "ALM / RLM" },
+    { document: "Lease expired", status: "Renuwal of Lease Deed", notes: "RLM/ NLM" },
+    { document: "Small speeling mistake in the name of Property owner's Deed and ID", status: "Dual Name affidavit", notes: "ALM" },
+    { document: "Small speeling mistake in the name of Property owner's Deed and ID", status: "Approval from ALM", notes: "ALM" },
+    { document: "Pending Litigation on Property", status: "Approval from NLM for pending Litigation", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Current stage of Litigation", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Complete litigation documents i.e. Plaint, Written Statement, Order copy (if any), Final Judgment", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Indemnity from Builder /seller / Borrower", notes: "NLM" }
+  ],
+  "Aurangabad Legal Cluster": [
+    { document: "chain documents lost", status: "Certified Copy of Deed", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "Indemnity", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "FIR", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "Public Notice for lost of Deeds by Advocate", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "NOC to Public Notice issued by Advocate", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "RM to be done", notes: "ALM / RLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "Certified Copy of Deed which is laminated", notes: "RLM/ NLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "Indemnity", notes: "RLM/ NLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "approval from RLM/ NLM", notes: "RLM/ NLM" },
+    { document: "cheque expired which is already mentioned in Deed", status: "Affidavit from seller / Borrower", notes: "ALM" },
+    { document: "Minor Interest involved", status: "Court permission required for minor property", notes: "RLM/ NLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Death Certificate of borrower / property owner", notes: "ALM / RLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Legal heirs affidavit / Details of all Legal heirs with age", notes: "ALM / RLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Ration Card", notes: "ALM / RLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "all Legal heirs should be on loan struture (including daughter)", notes: "ALM / RLM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "Death Certificate of Seller /property owner", notes: "ALM / RLM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "Legal heirs affidavit / Details of all Legal heirs with age", notes: "ALM / RLM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "all Legal heirs should be stand as seller in Sale Deed of Borrower (including daughter)", notes: "ALM / RLM" },
+    { document: "Legal Report expired", status: "get one year additional search done", notes: "ALM" },
+    { document: "Registration Receipt (RR) / Index II of any deed is missing", status: "OK with ALM approval", notes: "ALM" },
+    { document: "If PTR/ E Bill not in the name of Current Owner", status: "get Acknowledgement  to apply copy from respect Govt. Dept", notes: "ALM / RLM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Get Letter from GP for both Milkat No. is for same property", notes: "ALM / RLM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Both (old and New) Milkat No should be mentioned in upcoming registered Deed in purchase case", notes: "ALM / RLM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Both (old and New) Milkat No should be mentioned in RM / Gift deed in LAP / Self Constrution/ BT case", notes: "ALM / RLM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Revenue Record should be available", notes: "ALM / RLM" },
+    { document: "Small speeling mistake in the name of Property owner's Deed and ID", status: "Dual Name affidavit", notes: "ALM" },
+    { document: "Small speeling mistake in the name of Property owner's Deed and ID", status: "Approval from ALM", notes: "ALM" },
+    { document: "Pending Litigation on Property", status: "Approval from NLM for pending Litigation", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Current stage of Litigation", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Complete litigation documents i.e. Plaint, Written Statement, Order copy (if any), Final Judgment", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Indemnity from Builder /seller / Borrower", notes: "NLM" },
+    { document: "Notary cases In Aurangabad", status: "Registered Gift Deed to be done", notes: "NLM / RLM" },
+    { document: "Notary cases In Aurangabad", status: "Previous owner should be consenting Party to Gift Deed / Sale Deed", notes: "NLM / RLM" },
+    { document: "Notary cases In Aurangabad", status: "all original chain should be in custody", notes: "NLM / RLM" },
+    { document: "Notary cases In Aurangabad", status: "RM to be done", notes: "NLM / RLM" },
+    { document: "Joint ownership cases, part property coming", status: "Original Sale Deed should be in Shubham Custody", notes: "RLM" },
+    { document: "Joint ownership cases, part property coming", status: "RM to be done with Other part owner Consenting Party", notes: "RLM" },
+    { document: "Joint ownership cases, part property coming", status: "Partition Deed with four boundries", notes: "RLM" },
+    { document: "Family trasanction property", status: "Seller and Buyer both should be on loan structure", notes: "RLM" },
+    { document: "Family trasanction property", status: "RM to be done", notes: "RLM" },
+    { document: "Family trasanction property", status: "charge should be created on 7/12 Extract / Namuna", notes: "RLM" }
+  ],
+  "Nashik Legal Cluster": [
+    { document: "chain documents lost", status: "Certified Copy of Deed", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "Indemnity", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "FIR", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "Public Notice for lost of Deeds by Advocate", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "NOC to Public Notice issued by Advocate", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "RM to be done", notes: "ALM / RLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "Certified Copy of Deed which is laminated", notes: "RLM/ NLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "Indemnity", notes: "RLM/ NLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "approval from RLM/ NLM", notes: "RLM/ NLM" },
+    { document: "cheque expired which is already mentioned in Deed", status: "Affidavit from seller / Borrower", notes: "ALM" },
+    { document: "Minor Interest involved", status: "Court permission required for minor property", notes: "RLM/ NLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Death Certificate of borrower / property owner", notes: "ALM / RLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Legal heirs affidavit / Details of all Legal heirs with age", notes: "ALM / RLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Ration Card", notes: "ALM / RLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "all Legal heirs should be on loan struture (including daughter)", notes: "ALM / RLM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "Death Certificate of Seller /property owner", notes: "ALM / RLM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "Legal heirs affidavit / Details of all Legal heirs with age", notes: "ALM / RLM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "all Legal heirs should be stand as seller in Sale Deed of Borrower (including daughter)", notes: "ALM / RLM" },
+    { document: "Legal Report expired", status: "get one year additional search done", notes: "ALM" },
+    { document: "Registration Receipt (RR) / Index II of any deed is missing", status: "OK with ALM approval", notes: "ALM" },
+    { document: "If PTR/ E Bill not in the name of Current Owner", status: "get Acknowledgement  to apply copy from respect Govt. Dept", notes: "ALM / RLM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Get Letter from GP for both Milkat No. is for same property", notes: "ALM / RLM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Both (old and New) Milkat No should be mentioned in upcoming registered Deed in purchase case", notes: "ALM / RLM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Both (old and New) Milkat No should be mentioned in RM / Gift deed in LAP / Self Constrution/ BT case", notes: "ALM / RLM" },
+    { document: "old Milkat No. and New Milkat No.", status: "Revenue Record should be available", notes: "ALM / RLM" },
+    { document: "Small speeling mistake in the name of Property owner's Deed and ID", status: "Dual Name affidavit", notes: "ALM" },
+    { document: "Small speeling mistake in the name of Property owner's Deed and ID", status: "Approval from ALM", notes: "ALM" },
+    { document: "Pending Litigation on Property", status: "Approval from NLM for pending Litigation", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Current stage of Litigation", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Complete litigation documents i.e. Plaint, Written Statement, Order copy (if any), Final Judgment", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Indemnity from Builder /seller / Borrower", notes: "NLM" },
+    { document: "Notary cases In Aurangabad", status: "Registered Gift Deed to be done", notes: "NLM / RLM" },
+    { document: "Notary cases In Aurangabad", status: "Previous owner should be consenting Party to Gift Deed / Sale Deed", notes: "NLM / RLM" },
+    { document: "Notary cases In Aurangabad", status: "all original chain should be in custody", notes: "NLM / RLM" },
+    { document: "Notary cases In Aurangabad", status: "RM to be done", notes: "NLM / RLM" },
+    { document: "Joint ownership cases, part property coming", status: "Original Sale Deed should be in Shubham Custody", notes: "RLM" },
+    { document: "Joint ownership cases, part property coming", status: "RM to be done with Other part owner Consenting Party", notes: "RLM" },
+    { document: "Joint ownership cases, part property coming", status: "Partition Deed with four boundries", notes: "RLM" },
+    { document: "Family trasanction property", status: "Seller and Buyer both should be on loan structure", notes: "RLM" },
+    { document: "Family trasanction property", status: "RM to be done", notes: "RLM" },
+    { document: "Family trasanction property", status: "charge should be created on 7/12 Extract / Namuna", notes: "RLM" }
+  ],
+  "Mumbai Legal Cluster": [
+    { document: "chain documents lost", status: "Certified Copy of Deed", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "Indemnity", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "FIR", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "Public Notice for lost of Deeds by Advocate", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "NOC to Public Notice issued by Advocate", notes: "ALM / RLM" },
+    { document: "chain documents lost", status: "RM to be done", notes: "ALM / RLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "Certified Copy of Deed which is laminated", notes: "RLM/ NLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "Indemnity", notes: "RLM/ NLM" },
+    { document: "Laminated Deed / Letters (not OK if title Deed of Borrower is laminated)", status: "approval from RLM/ NLM", notes: "RLM/ NLM" },
+    { document: "cheque expired which is already mentioned in Deed", status: "Affidavit from seller / Borrower", notes: "ALM" },
+    { document: "Minor Interest involved", status: "Court permission required for minor property", notes: "RLM/ NLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Death Certificate of borrower / property owner", notes: "ALM / RLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Legal heirs affidavit / Details of all Legal heirs with age", notes: "ALM / RLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "Ration Card", notes: "ALM / RLM" },
+    { document: "In case of Death of borrower in LAP / BT/ Self Constrution case", status: "all Legal heirs should be on loan struture (including daughter)", notes: "ALM / RLM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "Death Certificate of Seller /property owner", notes: "ALM / RLM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "Legal heirs affidavit / Details of all Legal heirs with age", notes: "ALM / RLM" },
+    { document: "In case of death of seller in purchase / P+ C/Resale case", status: "all Legal heirs should be stand as seller in Sale Deed of Borrower (including daughter)", notes: "ALM / RLM" },
+    { document: "in case of Development Agreement is notarized in Purchase case", status: "POA should be registered", notes: "ALM / RLM" },
+    { document: "in case of Development Agreement is notarized in Purchase case", status: "Flat Bifurcation List should be on record with signature of Landowners and Developer", notes: "ALM / RLM" },
+    { document: "in case of Development Agreement is notarized in Purchase case", status: "ATS should be done by Landowners and Builder should be consenting Party", notes: "ALM / RLM" },
+    { document: "Legal Report expired", status: "get one year additional search done", notes: "ALM" },
+    { document: "Registration Receipt (RR) / Index II of any deed is missing", status: "OK with ALM approval", notes: "ALM" },
+    { document: "If PTR/ E Bill not in the name of Current Owner", status: "get Acknowledgement  to apply copy from respect Govt. Dept", notes: "ALM / RLM" },
+    { document: "Previous ATS / Chain is Notarized", status: "Approval from RLM / NLM required", notes: "RLM" },
+    { document: "Previous ATS / Chain is Notarized", status: "Builder should be consenting Party to ATS of Borrower", notes: "RLM" },
+    { document: "Previous ATS / Chain is Notarized", status: "RM to be done", notes: "RLM" },
+    { document: "Previous ATS / Chain is Notarized", status: "PTR / E Bill should be in the name of Current owner", notes: "RLM" },
+    { document: "Small speeling mistake in the name of Property owner's Deed and ID", status: "Dual Name affidavit", notes: "ALM" },
+    { document: "Small speeling mistake in the name of Property owner's Deed and ID", status: "Approval from ALM", notes: "ALM" },
+    { document: "Pending Litigation on Property", status: "Approval from NLM for pending Litigation", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Current stage of Litigation", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Complete litigation documents i.e. Plaint, Written Statement, Order copy (if any), Final Judgment", notes: "NLM" },
+    { document: "Pending Litigation on Property", status: "Indemnity from Builder /seller / Borrower", notes: "NLM" },
+    { document: "Investment flats, reg ATS not there of investor", status: "Invenstor should be seller to ATS of borrower", notes: "RLM/ NLM" },
+    { document: "Investment flats, reg ATS not there of investor", status: "Builder should be consenting Party to ATS of Borrower", notes: "RLM/ NLM" },
+    { document: "Investment flats, reg ATS not there of investor", status: "Cheque should be in favor of Investor", notes: "RLM/ NLM" },
+    { document: "Landowners flat sold by builder", status: "Landowner should be consenting Party to ATS of Borrower", notes: "RLM/ NLM" },
+    { document: "Landowners flat sold by builder", status: "Landowner NOC to mortagge to be taken", notes: "RLM/ NLM" },
+    { document: "Landowners flat sold by builder", status: "Flat Bifurcation List to be on record with signed by landonwer and builder", notes: "RLM/ NLM" }
+  ],
+  // Technical Deviations
+  "Uttar Pradesh Tech Cluster": [
+    { document: "Land Survey", status: "Complete", notes: "Survey completed", date: "2023-06-01" },
+    { document: "Environmental Audit", status: "Pending", notes: "Scheduled for next week", date: "2023-06-10" }
+  ],
+  "Delhi Tech Cluster": [
+    { document: "Electrical Inspection", status: "Complete", notes: "Load capacity verified", date: "2023-03-15" },
+    { document: "Fire Safety Check", status: "Pending", notes: "Waiting for NOC", date: "2023-03-20" }
+  ]
+};
+
+let currentCategory = "";
+let currentZone = "";
+let currentRegion = "";
+
+function renderSidebar() {
+  const sidebar = document.querySelector(".sidebar");
+  sidebar.innerHTML = "";
+
+  for (const category in locationData) {
+    const heading = document.createElement("h3");
+    heading.className = "sidebar-heading";
+    heading.textContent = category;
+    heading.onclick = () => {
+      document.querySelectorAll(".sidebar-heading").forEach(h => h.classList.remove("active"));
+      
+      const zoneButtons = document.querySelectorAll(`.zone-tab[data-category="${category}"]`);
+      const isExpanded = zoneButtons[0] && zoneButtons[0].style.display === "block";
+      
+      if (!isExpanded) {
+        heading.classList.add("active");
+      }
+      
+      zoneButtons.forEach(btn => {
+        btn.style.display = isExpanded ? "none" : "block";
+        if (isExpanded) {
+          btn.nextElementSibling.style.display = "none";
+        }
+      });
+    };
+    sidebar.appendChild(heading);
+
+    for (const zone in locationData[category]) {
+      const zoneBtn = document.createElement("button");
+      zoneBtn.className = "zone-tab";
+      zoneBtn.textContent = zone;
+      zoneBtn.setAttribute("data-category", category);
+      zoneBtn.style.display = "none";
+      zoneBtn.onclick = (e) => {
+        e.stopPropagation();
+        selectZone(category, zone);
+      };
+      sidebar.appendChild(zoneBtn);
+
+      const regionDiv = document.createElement("div");
+      regionDiv.className = "region-list";
+      regionDiv.id = `${category}-${zone}-regions`;
+      regionDiv.style.display = "none";
+
+      for (const region in locationData[category][zone]) {
+        const regionEl = document.createElement("div");
+        regionEl.textContent = region;
+        regionEl.onclick = (e) => {
+          e.stopPropagation();
+          selectRegion(region, category, zone);
+        };
+        regionDiv.appendChild(regionEl);
+      }
+
+      sidebar.appendChild(regionDiv);
+    }
+  }
+}
+
+function selectZone(category, zone) {
+  document.querySelectorAll(".zone-tab").forEach(btn => btn.classList.remove("active"));
+  
+  const selectedZoneBtn = [...document.querySelectorAll(".zone-tab")].find(btn => 
+    btn.textContent === zone && btn.getAttribute("data-category") === category
+  );
+  if (selectedZoneBtn) selectedZoneBtn.classList.add("active");
+
+  document.querySelectorAll(".region-list").forEach(div => div.style.display = "none");
+  
+  const regionDiv = document.getElementById(`${category}-${zone}-regions`);
+  if (regionDiv) {
+    regionDiv.style.display = "block";
+  }
+
+  currentCategory = category;
+  currentZone = zone;
+  currentRegion = "";
+  document.getElementById("welcome").style.display = "block";
+  document.getElementById("filters").style.display = "none";
+  document.getElementById("docContent").innerHTML = "";
+  document.getElementById("docContent2").innerHTML = "";
+}
+
+function selectRegion(region, category, zone) {
+  document.querySelectorAll(".region-list div").forEach(div => div.classList.remove("active"));
+  
+  const regionDivs = document.querySelectorAll(".region-list div");
+  for (const div of regionDivs) {
+    if (div.textContent === region) {
+      div.classList.add("active");
+      break;
+    }
+  }
+
+  currentCategory = category || currentCategory;
+  currentZone = zone || currentZone;
+  currentRegion = region;
+
+  const stateSelect = document.getElementById("stateSelect");
+  stateSelect.innerHTML = `<option value="">Select Region</option>`;
+
+  const regionData = locationData[currentCategory][currentZone][region];
+  for (const state in regionData) {
+    const option = document.createElement("option");
+    option.value = state;
+    option.textContent = state;
+    stateSelect.appendChild(option);
+  }
+
+  document.getElementById("docTypeSelect").innerHTML = `<option value="">Select Property Type</option>`;
+  document.getElementById("caseTypeSelect").innerHTML = `<option value="">Select Case Type</option>`;
+  document.getElementById("docContent").innerHTML = "";
+  document.getElementById("docContent2").innerHTML = "";
+  document.getElementById("welcome").style.display = "none";
+  document.getElementById("filters").style.display = "block";
+
+  updateBreadcrumb({ 
+    category: currentCategory, 
+    zone: currentZone, 
+    region: currentRegion 
+  });
+}
+
+function loadBranches() {
+  const state = document.getElementById("stateSelect").value;
+  const docTypeSelect = document.getElementById("docTypeSelect");
+  docTypeSelect.innerHTML = `<option value="">Select Property Type</option>`;
+
+  if (docStructure[state]) {
+    const docTypes = Object.keys(docStructure[state]);
+    docTypes.forEach(type => {
+      const option = document.createElement("option");
+      option.value = type;
+      option.textContent = type;
+      docTypeSelect.appendChild(option);
+    });
+  }
+  
+  updateBreadcrumb({ 
+    category: currentCategory, 
+    zone: currentZone, 
+    region: currentRegion,
+    state
+  });
+}
+
+function loadCaseTypes() {
+  const state = document.getElementById("stateSelect").value;
+  const docType = document.getElementById("docTypeSelect").value;
+  const caseTypeSelect = document.getElementById("caseTypeSelect");
+  caseTypeSelect.innerHTML = `<option value="">Select Case Type</option>`;
+
+  if (docStructure[state] && docStructure[state][docType]) {
+    const caseTypes = Object.keys(docStructure[state][docType]);
+    caseTypes.forEach(ct => {
+      const option = document.createElement("option");
+      option.value = ct;
+      option.textContent = ct;
+      caseTypeSelect.appendChild(option);
+    });
+  }
+  
+  updateBreadcrumb({ 
+    category: currentCategory, 
+    zone: currentZone, 
+    region: currentRegion,
+    state,
+    docType
+  });
+}
+
+function loadDocs() {
+  const state = document.getElementById("stateSelect").value;
+  const docType = document.getElementById("docTypeSelect").value;
+  const caseType = document.getElementById("caseTypeSelect").value;
+
+  const outputContainer1 = document.getElementById("docContent");
+  const outputContainer2 = document.getElementById("docContent2");
+
+  outputContainer1.innerHTML = "";
+  outputContainer2.innerHTML = "";
+
+  if (docStructure[state] && docStructure[state][docType] && docStructure[state][docType][caseType]) {
+    const docs = docStructure[state][docType][caseType];
+
+    function buildHTML(title, docs) {
+      let html = `<div class="accordion">`;
+      html += `<span class="doc-type-badge ${currentCategory.toLowerCase()}">${currentCategory}</span>`;
+      html += `<button class="collapsible">${title}</button>`;
+      html += `<div class="content"><ul>`;
+
+      docs.forEach(doc => {
+        const icon = "fas fa-check-circle";
+        html += `<li><i class="${icon}" style="color: ${currentCategory === 'Technical' ? 'var(--tech-color)' : 'green'}; margin-right: 8px;"></i>${doc}</li>`;
+      });
+
+      html += `</ul></div></div>`;
+      return html;
+    }
+
+    outputContainer1.innerHTML = buildHTML(`${state} → ${docType} → ${caseType}`, docs);
+    
+    // DEVIATION MATRIX (CLUSTER-LEVEL ONLY)
+    // DEVIATION MATRIX (CLUSTER-LEVEL ONLY)
+if (secondaryDocStructure[state]) {
+  const customDocs = secondaryDocStructure[state];
+
+  let tableHTML = `<div class="accordion">`;
+  tableHTML += `<span class="doc-type-badge ${currentCategory.toLowerCase()}">${currentCategory}</span>`;
+  tableHTML += `<button class="collapsible">📋 ${state} Deviations</button>`;
+  tableHTML += `<div class="content">`;
+  tableHTML += `<table class="deviation-table">`;
+tableHTML += `<thead><tr>
+  <th>Kind of Deviation</th>
+  <th>Possible Alternatives with Approval</th>
+  <th>Approval Authority</th>
+</tr></thead><tbody>`;
+
+customDocs.forEach(item => {
+  const statusClass = `status-${item.status.toLowerCase().replace(/\s+/g, '-')}`;
+  tableHTML += `<tr>
+    <td>${item.document}</td>
+    <td class="${statusClass}">${item.status}</td>
+    <td>${item.notes}</td>
+  </tr>`;
+});
+      
+      tableHTML += `</tbody></table></div></div>`;
+      outputContainer2.innerHTML = tableHTML;
+    }
+
+    document.querySelectorAll(".collapsible").forEach(button => {
+      button.addEventListener("click", function() {
+        this.classList.toggle("active");
+        const content = this.nextElementSibling;
+        content.style.display = content.style.display === "block" ? "none" : "block";
+      });
+    });
+  } else {
+    outputContainer1.innerHTML = `<p style="color:red;"><strong>No documents found for the selected criteria.</strong></p>`;
+  }
+  
+  updateBreadcrumb({ 
+    category: currentCategory, 
+    zone: currentZone, 
+    region: currentRegion,
+    state,
+    docType,
+    caseType
+  });
+}
+
+function searchDocs() {
+  const val = document.getElementById("searchBar").value.toLowerCase();
+  document.querySelectorAll("#docContent ul li").forEach(li => {
+    li.style.display = li.textContent.toLowerCase().includes(val) ? "list-item" : "none";
+  });
+}
+
+function updateBreadcrumb({ category, zone, region, state, docType, caseType }) {
+  let trail = category || currentCategory;
+  if (zone) trail += " > " + zone;
+  if (region) trail += " > " + region;
+  if (state) trail += " > " + state;
+  if (docType) trail += " > " + docType;
+  if (caseType) trail += " > " + caseType;
+
+  const breadcrumb = document.getElementById("breadcrumb");
+  breadcrumb.innerText = trail;
+  breadcrumb.style.opacity = 0;
+  setTimeout(() => {
+    breadcrumb.style.opacity = 1;
+  }, 50);
+}
+
+function resetAllFilters() {
+  // Reset the UI to initial state
+  document.getElementById("welcome").style.display = "block";
+  document.getElementById("filters").style.display = "none";
+  document.getElementById("docContent").innerHTML = "";
+  document.getElementById("docContent2").innerHTML = "";
+  
+  // Reset dropdowns
+  document.getElementById("stateSelect").innerHTML = '<option value="">Select Region</option>';
+  document.getElementById("docTypeSelect").innerHTML = '<option value="">Select Property Type</option>';
+  document.getElementById("caseTypeSelect").innerHTML = '<option value="">Select Case Type</option>';
+  document.getElementById("searchBar").value = "";
+  
+  // Reset breadcrumb
+  document.getElementById("breadcrumb").innerText = "";
+  
+  // Reset sidebar selections
+  document.querySelectorAll(".sidebar-heading").forEach(h => h.classList.remove("active"));
+  document.querySelectorAll(".zone-tab").forEach(btn => {
+    btn.classList.remove("active");
+    btn.style.display = "none";
+  });
+  document.querySelectorAll(".region-list").forEach(div => {
+    div.style.display = "none";
+  });
+  document.querySelectorAll(".region-list div").forEach(div => div.classList.remove("active"));
+  
+  // Reset current selections
+  currentCategory = "";
+  currentZone = "";
+  currentRegion = "";
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const mainContent = document.getElementById("mainContent");
+  const toggleBtn = document.getElementById("toggleSidebar");
+  
+  sidebar.classList.toggle("collapsed");
+  mainContent.classList.toggle("expanded");
+  
+  if (sidebar.classList.contains("collapsed")) {
+    toggleBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+  } else {
+    toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+  }
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+  renderSidebar();
+  document.getElementById("welcome").style.display = "block";
+  
+  document.getElementById("toggleSidebar").addEventListener("click", toggleSidebar);
+  
+  document.querySelectorAll(".collapsible").forEach(button => {
+    button.addEventListener("click", function() {
+      this.classList.toggle("active");
+      const content = this.nextElementSibling;
+      content.style.display = content.style.display === "block" ? "none" : "block";
+    });
+  });
+});
+</script>
+</body>
+</html>
