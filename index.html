@@ -6,6 +6,8 @@
   <title>Collateral Policies</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
     :root {
@@ -433,6 +435,48 @@
       padding-left: 10px;
       margin-top: 20px;
     }
+
+    .tool-container {
+      display: none;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      background: #f9f9f9;
+      margin-bottom: 20px;
+    }
+
+    .tool-button {
+      padding: 8px 12px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .tool-input {
+        margin-bottom: 10px;
+    }
+
+    .tool-output {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .download-link {
+      padding: 8px 12px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .card.clickable-card {
+        cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -445,7 +489,7 @@
       <a href="#" id="resetFilters" onclick="resetAllFilters()">
         <i class="fas fa-undo"></i> Reset Filters
       </a>
-      <a href="#">Home</a>
+      <a href="#" id="home-button">Home</a>
       <a href="https://www.shubham.co/contact-us">Contact Us</a>
       <a href="https://www.shubham.co/">Website</a>
     </div>
@@ -483,7 +527,31 @@
             <h3>Need Help?</h3>
             <p>Contact support or view the user guide.</p>
           </div>
+          <div class="card clickable-card" id="pdf-compressor-card">
+            <h3>PDF Compressor</h3>
+            <p>Compress your PDF files to reduce their size.</p>
+          </div>
+          <div class="card clickable-card" id="pdf-to-word-card">
+            <h3>PDF to Word</h3>
+            <p>Convert your PDF files to Word documents (text only).</p>
+          </div>
         </div>
+      </div>
+
+      <div id="pdf-compressor-tool" class="tool-container" style="display:none;">
+        <h2>PDF Compressor</h2>
+        <p>Upload a PDF file to compress it. This tool performs basic optimizations and may not significantly reduce the size of all files.</p>
+        <input type="file" id="compress-input" accept=".pdf" class="tool-input">
+        <button id="compress-button" class="tool-button">Compress</button>
+        <div id="compress-output" class="tool-output"></div>
+      </div>
+
+      <div id="pdf-to-word-tool" class="tool-container" style="display:none;">
+        <h2>PDF to Word Converter</h2>
+        <p style="color:red;"><strong>Disclaimer:</strong> This tool only extracts text content from the PDF. All formatting, images, and tables will be lost.</p>
+        <input type="file" id="convert-input" accept=".pdf" class="tool-input">
+        <button id="convert-button" class="tool-button">Convert to Word</button>
+        <div id="convert-output" class="tool-output"></div>
       </div>
 
       <div class="filters" id="filters" style="display:none;">
@@ -2872,6 +2940,10 @@ function resetAllFilters() {
   document.getElementById("docContent").innerHTML = "";
   document.getElementById("docContent2").innerHTML = "";
   
+  // Hide tool sections
+  if(document.getElementById('pdf-compressor-tool')) document.getElementById('pdf-compressor-tool').style.display = 'none';
+  if(document.getElementById('pdf-to-word-tool')) document.getElementById('pdf-to-word-tool').style.display = 'none';
+
   // Reset dropdowns
   document.getElementById("stateSelect").innerHTML = '<option value="">Select Region</option>';
   document.getElementById("docTypeSelect").innerHTML = '<option value="">Select Property Type</option>';
@@ -2926,6 +2998,124 @@ window.addEventListener("DOMContentLoaded", function() {
       content.style.display = content.style.display === "block" ? "none" : "block";
     });
   });
+
+  document.getElementById('pdf-compressor-card').addEventListener('click', () => {
+    document.getElementById('welcome').style.display = 'none';
+    document.getElementById('filters').style.display = 'none';
+    document.getElementById('docContent').innerHTML = '';
+    document.getElementById('docContent2').innerHTML = '';
+    document.getElementById('pdf-compressor-tool').style.display = 'block';
+    document.getElementById('pdf-to-word-tool').style.display = 'none';
+    if (!document.getElementById('sidebar').classList.contains('collapsed')) {
+        toggleSidebar();
+    }
+  });
+
+  document.getElementById('pdf-to-word-card').addEventListener('click', () => {
+    document.getElementById('welcome').style.display = 'none';
+    document.getElementById('filters').style.display = 'none';
+    document.getElementById('docContent').innerHTML = '';
+    document.getElementById('docContent2').innerHTML = '';
+    document.getElementById('pdf-compressor-tool').style.display = 'none';
+    document.getElementById('pdf-to-word-tool').style.display = 'block';
+    if (!document.getElementById('sidebar').classList.contains('collapsed')) {
+        toggleSidebar();
+    }
+  });
+
+  document.getElementById('home-button').addEventListener('click', (e) => {
+      e.preventDefault();
+      resetAllFilters();
+  });
+
+  if(document.getElementById('compress-button')) {
+    document.getElementById('compress-button').addEventListener('click', async () => {
+      const input = document.getElementById('compress-input');
+      if (input.files.length === 0) {
+        alert("Please select a PDF file first.");
+        return;
+      }
+      const file = input.files[0];
+      const outputDiv = document.getElementById('compress-output');
+      outputDiv.innerHTML = 'Compressing...';
+
+      try {
+        const { PDFDocument } = PDFLib;
+        const existingPdfBytes = await file.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(existingPdfBytes, {
+            updateMetadata: false
+        });
+
+        const pdfBytes = await pdfDoc.save();
+
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const originalSize = (file.size / 1024).toFixed(2);
+        const newSize = (pdfBytes.length / 1024).toFixed(2);
+        const reduction = Math.max(0, ((file.size - pdfBytes.length) / file.size) * 100).toFixed(2);
+
+        outputDiv.innerHTML = `
+          <p>Original size: ${originalSize} KB</p>
+          <p>New size: ${newSize} KB</p>
+          <p>Reduction: ${reduction}%</p>
+          <a href="${url}" download="compressed-${file.name}" class="download-link">Download Compressed PDF</a>
+        `;
+      } catch (error) {
+        console.error(error);
+        outputDiv.innerHTML = `<p style="color:red;">An error occurred during compression: ${error.message}</p>`;
+      }
+    });
+  }
+
+  if(document.getElementById('convert-button')) {
+    document.getElementById('convert-button').addEventListener('click', async () => {
+        const input = document.getElementById('convert-input');
+        if (input.files.length === 0) {
+            alert("Please select a PDF file first.");
+            return;
+        }
+        const file = input.files[0];
+        const outputDiv = document.getElementById('convert-output');
+        outputDiv.innerHTML = 'Converting...';
+
+        try {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+
+            const fileReader = new FileReader();
+            fileReader.onload = async function() {
+                try {
+                    const typedarray = new Uint8Array(this.result);
+                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                    let fullText = '';
+
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + '\\n\\n';
+                    }
+
+                    const blob = new Blob([fullText], { type: 'application/msword' });
+                    const url = URL.createObjectURL(blob);
+                    const fileName = file.name.replace(/\.pdf$/i, '.doc');
+
+                    outputDiv.innerHTML = `
+                        <p>Conversion complete. The .doc file contains the extracted text.</p>
+                        <a href="${url}" download="${fileName}" class="download-link">Download Word Document</a>
+                    `;
+                } catch (error) {
+                    console.error(error);
+                    outputDiv.innerHTML = `<p style="color:red;">An error occurred during conversion: ${error.message}</p>`;
+                }
+            };
+            fileReader.readAsArrayBuffer(file);
+
+        } catch (error) {
+            console.error(error);
+            outputDiv.innerHTML = `<p style="color:red;">An error occurred setting up the converter: ${error.message}</p>`;
+        }
+    });
+  }
 });
 </script>
 </body>
