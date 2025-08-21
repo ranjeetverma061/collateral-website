@@ -540,7 +540,16 @@
 
       <div id="pdf-compressor-tool" class="tool-container" style="display:none;">
         <h2>PDF Compressor</h2>
-        <p>Upload a PDF file to compress it. This tool performs basic optimizations and may not significantly reduce the size of all files.</p>
+        <p>Upload a PDF file to compress it. Select optimizations to apply.</p>
+        <div id="compression-options" style="margin-bottom: 15px; padding: 10px; background: #efefef; border-radius: 6px;">
+            <strong>Optimizations:</strong><br>
+            <label style="margin-right: 15px; cursor: pointer;">
+                <input type="checkbox" id="flatten-forms-checkbox" checked> Flatten Forms
+            </label>
+            <label style="cursor: pointer;">
+                <input type="checkbox" id="clear-metadata-checkbox" checked> Clear Metadata
+            </label>
+        </div>
         <input type="file" id="compress-input" accept=".pdf" class="tool-input">
         <button id="compress-button" class="tool-button">Compress</button>
         <div id="compress-output" class="tool-output"></div>
@@ -3039,12 +3048,37 @@ window.addEventListener("DOMContentLoaded", function() {
       const outputDiv = document.getElementById('compress-output');
       outputDiv.innerHTML = 'Compressing...';
 
+      const flattenForms = document.getElementById('flatten-forms-checkbox').checked;
+      const clearMetadata = document.getElementById('clear-metadata-checkbox').checked;
+
       try {
         const { PDFDocument } = PDFLib;
         const existingPdfBytes = await file.arrayBuffer();
         const pdfDoc = await PDFDocument.load(existingPdfBytes, {
-            updateMetadata: false
+            ignoreEncryption: true
         });
+
+        if (flattenForms) {
+            try {
+                const form = pdfDoc.getForm();
+                if (form.getFields().length > 0) {
+                    form.flatten();
+                }
+            } catch (e) {
+                console.log("No form to flatten or an error occurred during flattening: ", e);
+            }
+        }
+
+        if (clearMetadata) {
+            pdfDoc.setTitle('');
+            pdfDoc.setAuthor('');
+            pdfDoc.setSubject('');
+            pdfDoc.setKeywords([]);
+            pdfDoc.setCreator('');
+            pdfDoc.setProducer('');
+            pdfDoc.setCreationDate(new Date(0));
+            pdfDoc.setModificationDate(new Date(0));
+        }
 
         const pdfBytes = await pdfDoc.save();
 
