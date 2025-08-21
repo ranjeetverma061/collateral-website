@@ -6,6 +6,8 @@
   <title>Collateral Policies</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     :root {
@@ -499,6 +501,7 @@
         </select>
         <input type="text" id="searchBar" placeholder="Search documents..." onkeyup="searchDocs()" />
         <button onclick="window.print()" style="margin-left:10px;padding:8px;border:none;background:var(--accent);color:white;border-radius:5px;cursor:pointer;">Print</button>
+        <button onclick="downloadPDF()" style="margin-left:10px;padding:8px;border:none;background:var(--primary);color:white;border-radius:5px;cursor:pointer;">Download as PDF</button>
       </div>
 
       <div id="docContent" class="doc-section"></div>
@@ -2589,6 +2592,77 @@ const secondaryDocStructure = {
 let currentCategory = "";
 let currentZone = "";
 let currentRegion = "";
+
+function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const mainContent = document.getElementById('mainContent');
+
+  // Show a loading indicator
+  const loadingIndicator = document.createElement('div');
+  loadingIndicator.innerText = 'Generating PDF...';
+  loadingIndicator.style.position = 'fixed';
+  loadingIndicator.style.top = '50%';
+  loadingIndicator.style.left = '50%';
+  loadingIndicator.style.transform = 'translate(-50%, -50%)';
+  loadingIndicator.style.padding = '20px';
+  loadingIndicator.style.background = 'rgba(0,0,0,0.7)';
+  loadingIndicator.style.color = 'white';
+  loadingIndicator.style.borderRadius = '8px';
+  loadingIndicator.style.zIndex = '1001';
+  document.body.appendChild(loadingIndicator);
+
+  // Expand all collapsibles to ensure all content is visible for capture
+  const collapsibles = mainContent.querySelectorAll('.collapsible');
+  const originalStates = [];
+  collapsibles.forEach(collapsible => {
+    const content = collapsible.nextElementSibling;
+    originalStates.push(content.style.display);
+    content.style.display = 'block';
+  });
+
+  html2canvas(mainContent, {
+      useCORS: true,
+      scale: 2 // for better quality
+  }).then(canvas => {
+      // Restore collapsibles to their original state
+      collapsibles.forEach((collapsible, index) => {
+          const content = collapsible.nextElementSibling;
+          content.style.display = originalStates[index];
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.9); // Use JPEG for compression
+      const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'pt',
+          format: 'a4'
+      });
+
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      let heightLeft = pdfHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pdf.internal.pageSize.getHeight();
+
+      while (heightLeft > 0) {
+          position = -heightLeft;
+          pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+          heightLeft -= pdf.internal.pageSize.getHeight();
+      }
+      pdf.save('collateral-policies.pdf');
+
+      // Remove loading indicator
+      document.body.removeChild(loadingIndicator);
+  }).catch(err => {
+      console.error("Error generating PDF:", err);
+      // Remove loading indicator on error
+      document.body.removeChild(loadingIndicator);
+  });
+}
 
 function renderSidebar() {
   const sidebar = document.querySelector(".sidebar");
