@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Tools - Collateral Portal</title>
+  
+  <!-- Collateral Page Icons & Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- PDF Tool Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+
+  <style>
+    /* --- Base Styles from Collateral.html --- */
+    :root {
+      --primary: #006ca7;
+      --primary-dark: #005a8c;
+      --primary-light: #e1f0fa;
+      --accent: #17a2b8;
+      --accent-dark: #13899c;
+      --bg-light: #f7f9fc;
+      --sidebar-bg: #ffffff;
+      --sidebar-border: #eef2f7;
+      --sidebar-text: #333333;
+      --sidebar-hover: #f0f4f9;
+      --sidebar-active: #e1f0fa;
+      --sidebar-icon: #6c757d;
+      --text-primary: #2d3748;
+      --text-secondary: #4a5568;
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 20px rgba(0,0,0,0.07), 0 6px 6px rgba(0,0,0,0.06);
+      --border-radius: 12px;
+    }
+    .theme-green { --primary: #2e7d32; --primary-dark: #1b5e20; --primary-light: #e8f5e9; --accent: #43a047; --accent-dark: #388e3c; }
+    .theme-purple { --primary: #6a1b9a; --primary-dark: #4a148c; --primary-light: #f3e5f5; --accent: #9c27b0; --accent-dark: #7b1fa2; }
+    .theme-dark {
+      --primary: #37474f; --primary-dark: #263238; --primary-light: #cfd8dc; --accent: #546e7a; --accent-dark: #455a64; --bg-light: #1a1d21; --sidebar-bg: #212529; --sidebar-border: #32383e; --sidebar-text: #f8f9fa; --sidebar-hover: #343a40; --sidebar-active: #0d6efd; --sidebar-icon: #adb5bd; --text-primary: #f8f9fa; --text-secondary: #ced4da;
+    }
+    .theme-dark .glass-panel { background: rgba(33, 37, 41, 0.7); border-color: var(--sidebar-border); color: var(--text-primary); }
+    .theme-dark .tab-btn { color: var(--text-secondary); }
+    .theme-dark .tab-btn.active { color: var(--primary-light); border-bottom-color: var(--primary-light); }
+    .theme-dark h2, .theme-dark p { color: var(--text-primary); }
+    .theme-dark .text-gray-600 { color: var(--text-secondary) !important; }
+    .theme-dark .text-gray-900 { color: var(--text-primary) !important; }
+    .theme-dark .drop-zone { border-color: #495057; background-color: rgba(255,255,255,0.05); }
+    .theme-dark .drop-zone.dragover { border-color: var(--accent); background-color: rgba(84, 110, 122, 0.2); }
+    .theme-dark .bg-gray-100 { background-color: #343a40; }
+    .theme-dark .text-gray-800 { color: var(--text-primary) !important; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { margin: 0; font-family: 'Poppins', 'Nunito', sans-serif; background: var(--bg-light); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; transition: background 0.3s ease, color 0.3s ease; }
+    .header { display: flex; justify-content: space-between; align-items: center; background: var(--primary); padding: 12px 20px; box-shadow: var(--shadow-md); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .icon { font-size: 1.4em; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .header-title { font-size: 1.17em; font-weight: 600; color: #ffffff; }
+    .header-nav { display: flex; align-items: center; gap: 10px; }
+    .header-nav a { padding: 8px 12px; border-radius: 20px; transition: var(--transition); color: rgba(255, 255, 255, 0.85); text-decoration: none; font-weight: 500; font-size: 0.85em; }
+    .header-nav a:hover, .header-nav a.active { background-color: var(--primary-dark); color: #ffffff; }
+    .theme-switcher { position: relative; display: flex; align-items: center; margin-left: 10px; }
+    .theme-btn { background: transparent; border: 1px solid rgba(255, 255, 255, 0.5); color: #ffffff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); }
+    .theme-btn:hover { background: var(--primary-dark); }
+    .theme-options { position: absolute; top: 50px; right: 0; background: var(--sidebar-bg); border-radius: var(--border-radius); box-shadow: var(--shadow-lg); padding: 10px; display: none; flex-direction: column; gap: 8px; z-index: 1001; }
+    .theme-options.show { display: flex; }
+    .theme-option { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 4px; cursor: pointer; transition: var(--transition); }
+    .theme-option:hover { background: var(--sidebar-hover); }
+    .theme-color { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); }
+    .theme-color.default { background: linear-gradient(135deg, #006ca7, #17a2b8); }
+    .theme-color.green { background: linear-gradient(135deg, #2e7d32, #43a047); }
+    .theme-color.purple { background: linear-gradient(135deg, #6a1b9a, #9c27b0); }
+    .theme-color.dark { background: linear-gradient(135deg, #37474f, #546e7a); }
+    .container { display: flex; min-height: 100vh; position: relative; padding-top: 64px; }
+    .main { flex: 1; padding: 25px; overflow-y: auto; transition: var(--transition); background-color: var(--bg-light); margin-left: 0; min-height: calc(100vh - 64px); width: 100%; }
+
+    /* --- Styles from PDF.html, adapted for the theme --- */
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--sidebar-border);
+        transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    .primary-button {
+        background-color: var(--primary);
+        color: white;
+        box-shadow: 0 4px 14px rgba(0, 123, 255, 0.25);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .primary-button:hover {
+        background-color: var(--primary-dark);
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+    }
+    .primary-button:disabled {
+        background-color: #a0cfff;
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+    .accent-blue-text {
+        color: var(--accent);
+    }
+    .drop-zone {
+        border: 2px dashed #cbd5e1;
+        transition: all 0.3s ease;
+    }
+    .drop-zone.dragover {
+        border-color: var(--primary);
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+    .tab-btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+        color: var(--text-secondary);
+    }
+    .tab-btn.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+    }
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border-left-color: #fff;
+        animation: spin 1s ease infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header from Collateral.html -->
+  <div class="header">
+    <div class="header-left">
+      <span class="icon"><i class="fas fa-file-pdf"></i></span>
+      <h2 class="header-title">PDF Tools</h2>
+    </div>
+    <div class="header-nav">
+      <a href="Collateral.html">Go to Collateral Policies</a>
+      <div class="theme-switcher">
+        <button class="theme-btn" id="themeBtn">
+          <i class="fas fa-palette"></i>
+        </button>
+        <div class="theme-options" id="themeOptions">
+          <div class="theme-option" onclick="setTheme('default')"><div class="theme-color default"></div><span>Default</span></div>
+          <div class="theme-option" onclick="setTheme('green')"><div class="theme-color green"></div><span>Green</span></div>
+          <div class="theme-option" onclick="setTheme('purple')"><div class="theme-color purple"></div><span>Purple</span></div>
+          <div class="theme-option" onclick="setTheme('dark')"><div class="theme-color dark"></div><span>Dark</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Main Content Area -->
+    <div class="main" id="mainContent">
+      <!-- PDF Tool Content Goes Here -->
+      <section class="w-full max-w-4xl mx-auto">
+          <div class="glass-panel rounded-2xl p-8 md:p-12">
+              <!-- Tabs -->
+              <div class="flex justify-center border-b border-gray-200 mb-8">
+                  <button id="compress-single-tab" class="tab-btn active">Compress Single PDF</button>
+                  <button id="compress-multiple-tab" class="tab-btn">Compress Multiple Files</button>
+                  <button id="convert-tab" class="tab-btn">PDF to Word</button>
+              </div>
+
+              <!-- PDF Compressor (Single) Tool Section -->
+              <div id="compressor-single-section">
+                  <h2 class="text-3xl font-bold text-gray-900 mb-4 text-center">Compress a Single PDF</h2>
+                  <p class="text-gray-600 mb-8 text-center">Reduce the size of a single PDF file and download it directly.</p>
+                  
+                  <div id="upload-area-compress-single" class="drop-zone rounded-xl p-10 text-center cursor-pointer bg-white/50">
+                      <input type="file" id="pdf-upload-compress-single" class="hidden" accept="application/pdf">
+                      <div class="flex flex-col items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 15v4m-3-3l3 3 3-3" /></svg>
+                          <p class="text-lg font-semibold text-gray-700">Drag & drop your PDF here</p>
+                          <p class="text-gray-500 mt-1">or</p>
+                          <button id="browse-btn-compress-single" class="mt-2 font-semibold accent-blue-text">Browse file</button>
+                      </div>
+                  </div>
+
+                  <div id="processing-area-compress-single" class="hidden mt-6 text-left">
+                      <div class="flex items-center justify-between bg-gray-100 p-4 rounded-lg">
+                          <div>
+                              <p class="font-semibold text-gray-800" id="file-name-compress-single"></p>
+                              <p class="text-sm text-gray-500" id="file-size-compress-single"></p>
+                          </div>
+                          <button id="cancel-btn-compress-single" class="text-red-500 hover:text-red-700 font-semibold">Cancel</button>
+                      </div>
+                      <div class="mt-6">
+                          <label for="quality-slider-single" class="block text-sm font-medium text-gray-700 mb-2">Compression Quality</label>
+                          <input id="quality-slider-single" type="range" min="0.1" max="1.0" value="0.7" step="0.1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                      </div>
+                      <button id="compress-btn-single" class="primary-button w-full py-3 mt-6 rounded-lg font-semibold text-lg flex justify-center items-center">Compress PDF</button>
+                      <p id="status-text-compress-single" class="text-center mt-4 text-gray-600"></p>
+                  </div>
+
+                  <div id="result-area-compress-single" class="hidden mt-6 text-center">
+                      <h3 class="text-2xl font-bold text-green-600">Compression Complete!</h3>
+                      <div class="flex justify-around items-center my-6 bg-gray-100 p-4 rounded-lg">
+                          <div><p class="text-sm text-gray-500">Original Size</p><p class="font-bold text-lg" id="original-size-single"></p></div>
+                          <div><p class="text-sm text-gray-500">New Size</p><p class="font-bold text-lg text-green-600" id="new-size-single"></p></div>
+                          <div><p class="text-sm text-gray-500">Reduction</p><p class="font-bold text-lg text-green-600" id="reduction-percent-single"></p></div>
+                      </div>
+                      <button id="download-btn-compress-single" class="primary-button w-full py-3 rounded-lg font-semibold text-lg">Download PDF</button>
+                      <button id="process-another-btn-compress-single" class="mt-4 font-semibold text-gray-600 hover:text-gray-800">Compress Another File</button>
+                  </div>
+              </div>
+
+              <!-- PDF Compressor (Multiple) Tool Section -->
+              <div id="compressor-multiple-section" class="hidden">
+                  <h2 class="text-3xl font-bold text-gray-900 mb-4 text-center">Compress Multiple Files (ZIP)</h2>
+                  <p class="text-gray-600 mb-8 text-center">Reduce the size of multiple PDF files and download them in a single zip archive.</p>
+                  
+                  <div id="upload-area-compress-multiple" class="drop-zone rounded-xl p-10 text-center cursor-pointer bg-white/50">
+                      <input type="file" id="pdf-upload-compress-multiple" class="hidden" accept="application/pdf" multiple>
+                      <div class="flex flex-col items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 15v4m-3-3l3 3 3-3" /></svg>
+                          <p class="text-lg font-semibold text-gray-700">Drag & drop your PDFs here</p>
+                          <p class="text-gray-500 mt-1">or</p>
+                          <button id="browse-btn-compress-multiple" class="mt-2 font-semibold accent-blue-text">Browse files</button>
+                      </div>
+                  </div>
+
+                  <div id="processing-area-compress-multiple" class="hidden mt-6 text-left">
+                      <div class="bg-gray-100 p-4 rounded-lg">
+                          <div class="flex justify-between items-center mb-2">
+                              <p class="font-semibold text-gray-800" id="file-count-compress-multiple"></p>
+                              <button id="cancel-btn-compress-multiple" class="text-red-500 hover:text-red-700 font-semibold">Cancel</button>
+                          </div>
+                          <div id="file-list-compress-multiple" class="max-h-32 overflow-y-auto text-sm text-gray-600"></div>
+                      </div>
+                      <div class="mt-6">
+                          <label for="quality-slider-multiple" class="block text-sm font-medium text-gray-700 mb-2">Compression Quality</label>
+                          <input id="quality-slider-multiple" type="range" min="0.1" max="1.0" value="0.7" step="0.1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                      </div>
+                      <button id="compress-btn-multiple" class="primary-button w-full py-3 mt-6 rounded-lg font-semibold text-lg flex justify-center items-center">Compress Files</button>
+                      <p id="status-text-compress-multiple" class="text-center mt-4 text-gray-600"></p>
+                  </div>
+
+                  <div id="result-area-compress-multiple" class="hidden mt-6 text-center">
+                      <h3 class="text-2xl font-bold text-green-600">Compression Complete!</h3>
+                      <div class="flex justify-around items-center my-6 bg-gray-100 p-4 rounded-lg">
+                          <div><p class="text-sm text-gray-500">Original Size</p><p class="font-bold text-lg" id="original-size-multiple"></p></div>
+                          <div><p class="text-sm text-gray-500">New Size</p><p class="font-bold text-lg text-green-600" id="new-size-multiple"></p></div>
+                          <div><p class="text-sm text-gray-500">Reduction</p><p class="font-bold text-lg text-green-600" id="reduction-percent-multiple"></p></div>
+                      </div>
+                      <button id="download-btn-compress-multiple" class="primary-button w-full py-3 rounded-lg font-semibold text-lg">Download ZIP</button>
+                      <button id="process-another-btn-compress-multiple" class="mt-4 font-semibold text-gray-600 hover:text-gray-800">Compress More Files</button>
+                  </div>
+              </div>
+
+              <!-- PDF to Word Converter Section -->
+              <div id="converter-section" class="hidden">
+                   <h2 class="text-3xl font-bold text-gray-900 mb-4 text-center">Convert PDF to Word</h2>
+                  <p class="text-gray-600 mb-8 text-center">Extract text from your PDF and download it as a real Word (.docx) document.</p>
+                  
+                  <div id="upload-area-convert" class="drop-zone rounded-xl p-10 text-center cursor-pointer bg-white/50">
+                      <input type="file" id="pdf-upload-convert" class="hidden" accept="application/pdf">
+                      <div class="flex flex-col items-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 15v4m-3-3l3 3 3-3" /></svg>
+                          <p class="text-lg font-semibold text-gray-700">Drag & drop your PDF here</p>
+                          <p class="text-gray-500 mt-1">or</p>
+                          <button id="browse-btn-convert" class="mt-2 font-semibold accent-blue-text">Browse files</button>
+                      </div>
+                  </div>
+
+                  <div id="processing-area-convert" class="hidden mt-6 text-left">
+                      <div class="flex items-center justify-between bg-gray-100 p-4 rounded-lg">
+                          <div>
+                              <p class="font-semibold text-gray-800" id="file-name-convert"></p>
+                              <p class="text-sm text-gray-500" id="file-size-convert"></p>
+                          </div>
+                          <button id="cancel-btn-convert" class="text-red-500 hover:text-red-700 font-semibold">Cancel</button>
+                      </div>
+                      <button id="convert-btn" class="primary-button w-full py-3 mt-6 rounded-lg font-semibold text-lg flex justify-center items-center">Convert to Word</button>
+                      <p id="status-text-convert" class="text-center mt-4 text-gray-600"></p>
+                  </div>
+
+                  <div id="result-area-convert" class="hidden mt-6 text-center">
+                      <h3 class="text-2xl font-bold text-green-600">Conversion Complete!</h3>
+                      <p class="text-gray-600 my-4">Your document is ready for download.</p>
+                      <button id="download-btn-convert" class="primary-button w-full py-3 rounded-lg font-semibold text-lg">Download Word Document</button>
+                      <button id="process-another-btn-convert" class="mt-4 font-semibold text-gray-600 hover:text-gray-800">Convert Another File</button>
+                  </div>
+              </div>
+          </div>
+      </section>
+    </div>
+  </div>
+
+<script>
+    // --- Combined JavaScript from both files ---
+
+    // --- Portal/Collateral Page Logic ---
+    function setTheme(theme) {
+      document.body.className = theme ? `theme-${theme}` : '';
+      localStorage.setItem('portalTheme', theme);
+      document.getElementById('themeOptions').classList.remove('show');
+    }
+
+    function toggleThemeOptions() {
+      document.getElementById('themeOptions').classList.toggle('show');
+    }
+    
+    // --- PDF Tool Logic ---
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
+
+    const compressSingleTab = document.getElementById('compress-single-tab');
+    const compressMultipleTab = document.getElementById('compress-multiple-tab');
+    const convertTab = document.getElementById('convert-tab');
+    const compressorSingleSection = document.getElementById('compressor-single-section');
+    const compressorMultipleSection = document.getElementById('compressor-multiple-section');
+    const converterSection = document.getElementById('converter-section');
+    const uploadAreaCompressSingle = document.getElementById('upload-area-compress-single');
+    const processingAreaCompressSingle = document.getElementById('processing-area-compress-single');
+    const resultAreaCompressSingle = document.getElementById('result-area-compress-single');
+    const pdfUploadCompressSingle = document.getElementById('pdf-upload-compress-single');
+    const browseBtnCompressSingle = document.getElementById('browse-btn-compress-single');
+    const fileNameCompressSingle = document.getElementById('file-name-compress-single');
+    const fileSizeCompressSingle = document.getElementById('file-size-compress-single');
+    const cancelBtnCompressSingle = document.getElementById('cancel-btn-compress-single');
+    const compressBtnSingle = document.getElementById('compress-btn-single');
+    const statusTextCompressSingle = document.getElementById('status-text-compress-single');
+    const qualitySliderSingle = document.getElementById('quality-slider-single');
+    const originalSizeSingleEl = document.getElementById('original-size-single');
+    const newSizeSingleEl = document.getElementById('new-size-single');
+    const reductionPercentSingleEl = document.getElementById('reduction-percent-single');
+    const downloadBtnCompressSingle = document.getElementById('download-btn-compress-single');
+    const processAnotherBtnCompressSingle = document.getElementById('process-another-btn-compress-single');
+    const uploadAreaCompressMultiple = document.getElementById('upload-area-compress-multiple');
+    const processingAreaCompressMultiple = document.getElementById('processing-area-compress-multiple');
+    const resultAreaCompressMultiple = document.getElementById('result-area-compress-multiple');
+    const pdfUploadCompressMultiple = document.getElementById('pdf-upload-compress-multiple');
+    const browseBtnCompressMultiple = document.getElementById('browse-btn-compress-multiple');
+    const fileCountCompressMultiple = document.getElementById('file-count-compress-multiple');
+    const fileListCompressMultiple = document.getElementById('file-list-compress-multiple');
+    const cancelBtnCompressMultiple = document.getElementById('cancel-btn-compress-multiple');
+    const compressBtnMultiple = document.getElementById('compress-btn-multiple');
+    const statusTextCompressMultiple = document.getElementById('status-text-compress-multiple');
+    const qualitySliderMultiple = document.getElementById('quality-slider-multiple');
+    const originalSizeMultipleEl = document.getElementById('original-size-multiple');
+    const newSizeMultipleEl = document.getElementById('new-size-multiple');
+    const reductionPercentMultipleEl = document.getElementById('reduction-percent-multiple');
+    const downloadBtnCompressMultiple = document.getElementById('download-btn-compress-multiple');
+    const processAnotherBtnCompressMultiple = document.getElementById('process-another-btn-compress-multiple');
+    const uploadAreaConvert = document.getElementById('upload-area-convert');
+    const processingAreaConvert = document.getElementById('processing-area-convert');
+    const resultAreaConvert = document.getElementById('result-area-convert');
+    const pdfUploadConvert = document.getElementById('pdf-upload-convert');
+    const browseBtnConvert = document.getElementById('browse-btn-convert');
+    const fileNameConvert = document.getElementById('file-name-convert');
+    const fileSizeConvert = document.getElementById('file-size-convert');
+    const cancelBtnConvert = document.getElementById('cancel-btn-convert');
+    const convertBtn = document.getElementById('convert-btn');
+    const statusTextConvert = document.getElementById('status-text-convert');
+    const downloadBtnConvert = document.getElementById('download-btn-convert');
+    const processAnotherBtnConvert = document.getElementById('process-another-btn-convert');
+
+    let selectedFiles = [];
+
+    compressSingleTab.addEventListener('click', () => switchTab('single'));
+    compressMultipleTab.addEventListener('click', () => switchTab('multiple'));
+    convertTab.addEventListener('click', () => switchTab('convert'));
+
+    function switchTab(tabName) {
+        compressSingleTab.classList.toggle('active', tabName === 'single');
+        compressMultipleTab.classList.toggle('active', tabName === 'multiple');
+        convertTab.classList.toggle('active', tabName === 'convert');
+        compressorSingleSection.classList.toggle('hidden', tabName !== 'single');
+        compressorMultipleSection.classList.toggle('hidden', tabName !== 'multiple');
+        converterSection.classList.toggle('hidden', tabName !== 'convert');
+        resetAllStates();
+    }
+
+    function resetAllStates() {
+        uploadAreaCompressSingle.classList.remove('hidden');
+        processingAreaCompressSingle.classList.add('hidden');
+        resultAreaCompressSingle.classList.add('hidden');
+        pdfUploadCompressSingle.value = '';
+        statusTextCompressSingle.textContent = '';
+        compressBtnSingle.disabled = false;
+        compressBtnSingle.innerHTML = 'Compress PDF';
+        uploadAreaCompressMultiple.classList.remove('hidden');
+        processingAreaCompressMultiple.classList.add('hidden');
+        resultAreaCompressMultiple.classList.add('hidden');
+        pdfUploadCompressMultiple.value = '';
+        statusTextCompressMultiple.textContent = '';
+        compressBtnMultiple.disabled = false;
+        compressBtnMultiple.innerHTML = 'Compress Files';
+        uploadAreaConvert.classList.remove('hidden');
+        processingAreaConvert.classList.add('hidden');
+        resultAreaConvert.classList.add('hidden');
+        pdfUploadConvert.value = '';
+        statusTextConvert.textContent = '';
+        convertBtn.disabled = false;
+        convertBtn.innerHTML = 'Convert to Word';
+        selectedFiles = [];
+    }
+
+    browseBtnCompressSingle.addEventListener('click', () => pdfUploadCompressSingle.click());
+    pdfUploadCompressSingle.addEventListener('change', (e) => handleFileSelect(e.target.files, 'compress-single'));
+    cancelBtnCompressSingle.addEventListener('click', resetAllStates);
+    processAnotherBtnCompressSingle.addEventListener('click', resetAllStates);
+    uploadAreaCompressSingle.addEventListener('dragover', (e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); });
+    uploadAreaCompressSingle.addEventListener('dragleave', (e) => { e.preventDefault(); e.currentTarget.classList.remove('dragover'); });
+    uploadAreaCompressSingle.addEventListener('drop', (e) => { e.preventDefault(); e.currentTarget.classList.remove('dragover'); handleFileSelect(e.dataTransfer.files, 'compress-single'); });
+    compressBtnSingle.addEventListener('click', async () => {
+        if (selectedFiles.length > 0) {
+            const file = selectedFiles[0];
+            setLoadingState(compressBtnSingle, true);
+            statusTextCompressSingle.textContent = `Compressing ${file.name}...`;
+            try {
+                const quality = parseFloat(qualitySliderSingle.value);
+                const compressedBlob = await compressSinglePdf(file, quality);
+                downloadBtnCompressSingle.onclick = () => saveAs(compressedBlob, `compressed_${file.name}`);
+                originalSizeSingleEl.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+                newSizeSingleEl.textContent = `${(compressedBlob.size / 1024 / 1024).toFixed(2)} MB`;
+                const reduction = (100 - (compressedBlob.size / file.size * 100));
+                reductionPercentSingleEl.textContent = `${reduction.toFixed(1)}%`;
+                processingAreaCompressSingle.classList.add('hidden');
+                resultAreaCompressSingle.classList.remove('hidden');
+            } catch (error) {
+                console.error(`Failed to compress ${file.name}:`, error);
+                statusTextCompressSingle.textContent = `Skipping ${file.name} due to an error.`;
+            } finally {
+                setLoadingState(compressBtnSingle, false, 'Compress PDF');
+            }
+        }
+    });
+
+    browseBtnCompressMultiple.addEventListener('click', () => pdfUploadCompressMultiple.click());
+    pdfUploadCompressMultiple.addEventListener('change', (e) => handleFileSelect(e.target.files, 'compress-multiple'));
+    cancelBtnCompressMultiple.addEventListener('click', resetAllStates);
+    processAnotherBtnCompressMultiple.addEventListener('click', resetAllStates);
+    uploadAreaCompressMultiple.addEventListener('dragover', (e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); });
+    uploadAreaCompressMultiple.addEventListener('dragleave', (e) => { e.preventDefault(); e.currentTarget.classList.remove('dragover'); });
+    uploadAreaCompressMultiple.addEventListener('drop', (e) => { e.preventDefault(); e.currentTarget.classList.remove('dragover'); handleFileSelect(e.dataTransfer.files, 'compress-multiple'); });
+    compressBtnMultiple.addEventListener('click', () => { if (selectedFiles.length > 0) compressPdfBatchToZip(selectedFiles); });
+    
+    async function compressPdfBatchToZip(files) {
+        setLoadingState(compressBtnMultiple, true);
+        const zip = new JSZip();
+        let totalOriginalSize = 0;
+        let totalNewSize = 0;
+        const quality = parseFloat(qualitySliderMultiple.value);
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            statusTextCompressMultiple.textContent = `Compressing file ${i + 1} of ${files.length}: ${file.name}`;
+            try {
+                const compressedBlob = await compressSinglePdf(file, quality);
+                zip.file(`compressed_${file.name}`, compressedBlob);
+                totalOriginalSize += file.size;
+                totalNewSize += compressedBlob.size;
+            } catch (error) {
+                console.error(`Failed to compress ${file.name}:`, error);
+                statusTextCompressMultiple.textContent = `Skipping ${file.name} due to an error.`;
+            }
+        }
+        statusTextCompressMultiple.textContent = 'Creating ZIP file...';
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        downloadBtnCompressMultiple.onclick = () => saveAs(zipBlob, `compressed_files.zip`);
+        originalSizeMultipleEl.textContent = `${(totalOriginalSize / 1024 / 1024).toFixed(2)} MB`;
+        newSizeMultipleEl.textContent = `${(totalNewSize / 1024 / 1024).toFixed(2)} MB`;
+        const reduction = totalOriginalSize > 0 ? (100 - (totalNewSize / totalOriginalSize * 100)) : 0;
+        reductionPercentMultipleEl.textContent = `${reduction.toFixed(1)}%`;
+        processingAreaCompressMultiple.classList.add('hidden');
+        resultAreaCompressMultiple.classList.remove('hidden');
+        setLoadingState(compressBtnMultiple, false, 'Compress Files');
+    }
+
+    function compressSinglePdf(file, quality) {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.readAsArrayBuffer(file);
+            fileReader.onload = async (e) => {
+                try {
+                    const typedarray = new Uint8Array(e.target.result);
+                    const pdfDoc = await pdfjsLib.getDocument(typedarray).promise;
+                    const { jsPDF } = window.jspdf;
+                    const firstPage = await pdfDoc.getPage(1);
+                    const viewport = firstPage.getViewport({ scale: 1 });
+                    const orientation = viewport.width > viewport.height ? 'l' : 'p';
+                    const doc = new jsPDF(orientation, 'pt', [viewport.width, viewport.height]);
+                    doc.deletePage(1);
+                    for (let i = 1; i <= pdfDoc.numPages; i++) {
+                        const page = await pdfDoc.getPage(i);
+                        const viewport = page.getViewport({ scale: 1 });
+                        const canvas = document.createElement('canvas');
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+                        const context = canvas.getContext('2d');
+                        await page.render({ canvasContext: context, viewport: viewport }).promise;
+                        const imgData = canvas.toDataURL('image/jpeg', quality);
+                        doc.addPage([viewport.width, viewport.height], orientation);
+                        doc.addImage(imgData, 'JPEG', 0, 0, viewport.width, viewport.height);
+                    }
+                    resolve(doc.output('blob'));
+                } catch (error) {
+                    reject(error);
+                }
+            };
+            fileReader.onerror = reject;
+        });
+    }
+
+    browseBtnConvert.addEventListener('click', () => pdfUploadConvert.click());
+    pdfUploadConvert.addEventListener('change', (e) => handleFileSelect(e.target.files, 'convert'));
+    cancelBtnConvert.addEventListener('click', resetAllStates);
+    processAnotherBtnConvert.addEventListener('click', resetAllStates);
+    uploadAreaConvert.addEventListener('dragover', (e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); });
+    uploadAreaConvert.addEventListener('dragleave', (e) => { e.preventDefault(); e.currentTarget.classList.remove('dragover'); });
+    uploadAreaConvert.addEventListener('drop', (e) => { e.preventDefault(); e.currentTarget.classList.remove('dragover'); handleFileSelect(e.dataTransfer.files, 'convert'); });
+    convertBtn.addEventListener('click', () => { if (selectedFiles.length > 0) convertPdfToWord(selectedFiles[0]); });
+    
+    async function convertPdfToWord(file) {
+        setLoadingState(convertBtn, true);
+        statusTextConvert.textContent = 'Analyzing PDF structure...';
+        const fileReader = new FileReader();
+        fileReader.readAsArrayBuffer(file);
+        fileReader.onload = async (e) => {
+            try {
+                const typedarray = new Uint8Array(e.target.result);
+                const pdfDoc = await pdfjsLib.getDocument({ data: typedarray }).promise;
+                const docxParagraphs = [];
+                for (let i = 1; i <= pdfDoc.numPages; i++) {
+                    statusTextConvert.textContent = `Processing page ${i} of ${pdfDoc.numPages}...`;
+                    const page = await pdfDoc.getPage(i);
+                    const textContent = await page.getTextContent();
+                    let line = [];
+                    textContent.items.forEach(item => {
+                        line.push(new docx.TextRun(item.str));
+                        if(item.hasEOL) {
+                            docxParagraphs.push(new docx.Paragraph({ children: line }));
+                            line = [];
+                        }
+                    });
+                    if (line.length > 0) docxParagraphs.push(new docx.Paragraph({ children: line }));
+                }
+                const doc = new docx.Document({ sections: [{ children: docxParagraphs }] });
+                statusTextConvert.textContent = 'Generating .docx file...';
+                const blob = await docx.Packer.toBlob(doc);
+                const fileName = file.name.replace(/\.pdf$/i, '.docx');
+                downloadBtnConvert.onclick = () => saveAs(blob, fileName);
+                processingAreaConvert.classList.add('hidden');
+                resultAreaConvert.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error converting PDF:', error);
+                statusTextConvert.textContent = 'An error occurred during conversion.';
+            } finally {
+                setLoadingState(convertBtn, false, 'Convert to Word');
+            }
+        };
+    }
+
+    function handleFileSelect(files, type) {
+        if (files.length === 0) return;
+        selectedFiles = Array.from(files);
+        if (type === 'compress-multiple') {
+            uploadAreaCompressMultiple.classList.add('hidden');
+            processingAreaCompressMultiple.classList.remove('hidden');
+            fileCountCompressMultiple.textContent = `${selectedFiles.length} file(s) selected`;
+            fileListCompressMultiple.innerHTML = selectedFiles.map(f => `<div>${f.name}</div>`).join('');
+        } else if (type === 'compress-single') {
+            const file = selectedFiles[0];
+            uploadAreaCompressSingle.classList.add('hidden');
+            processingAreaCompressSingle.classList.remove('hidden');
+            fileNameCompressSingle.textContent = file.name;
+            fileSizeCompressSingle.textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        } else {
+            const file = selectedFiles[0];
+            uploadAreaConvert.classList.add('hidden');
+            processingAreaConvert.classList.remove('hidden');
+            fileNameConvert.textContent = file.name;
+            fileSizeConvert.textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        }
+    }
+
+    function setLoadingState(button, isLoading, defaultText) {
+        button.disabled = isLoading;
+        if (isLoading) {
+            button.innerHTML = '<div class="spinner"></div>';
+        } else {
+            button.innerHTML = defaultText;
+        }
+    }
+
+    // --- Initialize Page ---
+    window.addEventListener("DOMContentLoaded", function() {
+      const savedTheme = localStorage.getItem('portalTheme');
+      if (savedTheme) setTheme(savedTheme);
+      
+      document.getElementById("themeBtn").addEventListener("click", toggleThemeOptions);
+      
+      document.addEventListener("click", function(e) {
+        const themeBtn = document.getElementById("themeBtn");
+        const themeOptions = document.getElementById("themeOptions");
+        if (themeBtn && !themeBtn.contains(e.target) && themeOptions && !themeOptions.contains(e.target)) {
+          themeOptions.classList.remove("show");
+        }
+      });
+    });
+</script>
+</body>
+</html>
